@@ -1,0 +1,27 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+
+const routerOptions = [
+  { path: '/', component: 'Carousel' },
+  { path: '/animation', component: 'Animation' },
+  { path: '/article', component: 'Article' },
+  { path: '/bottomguider', component: 'BottomGuider' },
+  { path: '/carousel', component: 'Carousel' },
+  { path: '/guider', component: 'Guider' },
+  { path: '/pagedemo', component: 'PageDemo' },
+  { path: '*', component: 'NotFound' },
+]
+
+const routes = routerOptions.map(route => {
+  return {
+    ...route,
+    component: () => import(`@/components/${route.component}.vue`)
+  }
+})
+
+Vue.use(Router)
+
+export default new Router({
+  routes,
+  mode: 'history'
+})
