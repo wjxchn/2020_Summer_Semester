@@ -33,6 +33,16 @@
                     <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/team" class="guider-black">我的团队</a></div>
                     <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/recycler" class="guider-black">回收站</a></div>
                     <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/help" class="guider-black">使用帮助</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/article" class="guider-black">文章</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/animation" class="guider-black">卡片</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/pagedemo" class="guider-black">页面模板</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/uploadfile2" class="guider-black">上传文件</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/helloworld" class="guider-black">数据库测试</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/downloadfile" class="guider-black">下载文件</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/localstorage" class="guider-black">本地存储</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/plaintext_new" class="guider-black">富文本编辑</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/showplaintext_new" class="guider-black">显示富文本</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><a href="/sendemail" class="guider-black">发送邮件</a></div>
                 </div>
             </div>
         </div>
