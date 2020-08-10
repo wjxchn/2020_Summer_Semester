@@ -9,6 +9,8 @@ const routerOptions = [
   { path: '/carousel', component: 'Carousel' },
   { path: '/guider', component: 'Guider' },
   { path: '/pagedemo', component: 'PageDemo' },
+  { path:'/plaintext_new', component:'PlainText_new'},
+  { path:'/showplaintext_new', component:'ShowPlainText_new'},
   { path: '*', component: 'NotFound' },
 ]
 

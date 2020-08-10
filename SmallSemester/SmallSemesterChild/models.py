@@ -14,7 +14,7 @@ class Test3(models.Model):
     phonenumber = models.CharField(max_length=200,null=True,blank=True)
 
 class Plain(models.Model):
-    plainname = models.CharField(max_length=10000)
+    plainname = models.TextField()
 
 class UserExtension(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='extension')
