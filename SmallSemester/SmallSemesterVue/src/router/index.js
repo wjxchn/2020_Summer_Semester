@@ -9,6 +9,8 @@ const routerOptions = [
   { path: '/carousel', component: 'Carousel' },
   { path: '/guider', component: 'Guider' },
   { path: '/pagedemo', component: 'PageDemo' },
+  { path: '/login', component: 'Login' },
+  { path: '/regi', component: 'Regi' },
   { path: '*', component: 'NotFound' },
 ]
 
