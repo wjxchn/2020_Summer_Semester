@@ -13,6 +13,7 @@ const routerOptions = [
   { path: '/regi', component: 'Regi' },
   { path:'/plaintext_new', component:'PlainText_new'},
   { path:'/showplaintext_new', component:'ShowPlainText_new'},
+  { path:'/team', component:'Team'},
   { path: '*', component: 'NotFound' },
 ]
 
