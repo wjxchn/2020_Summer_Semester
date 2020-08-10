@@ -1,8 +1,12 @@
 <template>
 <div class="regi">
-	<h1 align="center" style="color:white;">欢迎注册福报文档</h1>
+    
     <el-container class="mid">
 		<el-main class="bc">
+		<h3 align="center" >加入我们</h3>
+		<el-image style="height:100px;width:300px" :src="'http://r.photo.store.qq.com/psc?/V143D3j445iBwL/45NBuzDIW489QBoVep5mcSvMd8hkV3G1vEW70bFpO7JTUQ723yi1Jhbhp1hlQxNVY0eXGtq17lrGf0NKyfp9YeeeHqL9wN2L3Mqqu7lECW8!/r'"></el-image>
+		
+        </el-header>
 			<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
 				<el-form-item  label="用户名" prop="name">
 					<el-input style="width:200px"  v-model="ruleForm.name"></el-input></el-form-item>
