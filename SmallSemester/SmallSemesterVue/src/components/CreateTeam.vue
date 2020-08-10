@@ -3,7 +3,7 @@
         <Guider id="navBar" :class="{isFixed:istabBar}"/>
         
         <main id="mainPart" role="main" class="container">
-            <div class="bc container">
+            <div class="bc">
                 <h3 align="center">创建团队</h3>
                 <el-form>   
                     <el-form-item>
@@ -72,15 +72,16 @@ export default {
     height:100%;
     z-index:-1;
     position:fixed;
-    background-image:url("../assets/login.png");
+    background-image:url("../assets/cteam.png");
     position: fixed;
     background-size: 100% 100%;
     overflow-y: auto;
 }
 .bc{
 	background-color:white; 
-    width: 300px;  
-	margin-top:2%;
+    margin-left:36%;
+    margin-right:36%;  
+	margin-top:10%;
 	border-radius:15px;
 }
 .bottom{
