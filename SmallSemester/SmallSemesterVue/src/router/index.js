@@ -11,9 +11,10 @@ const routerOptions = [
   { path: '/pagedemo', component: 'PageDemo' },
   { path: '/login', component: 'Login' },
   { path: '/regi', component: 'Regi' },
-  { path:'/plaintext_new', component:'PlainText_new'},
-  { path:'/showplaintext_new', component:'ShowPlainText_new'},
-  { path:'/team', component:'Team'},
+  { path: '/plaintext_new', component:'PlainText_new'},
+  { path: '/showplaintext_new', component:'ShowPlainText_new'},
+  { path: '/personaldoc', component:'PersonalDoc'},
+  { path: '/team', component:'Team'},
   { path: '/createteam' , component: 'CreateTeam'},
   { path: '*', component: 'NotFound' },
 ]
