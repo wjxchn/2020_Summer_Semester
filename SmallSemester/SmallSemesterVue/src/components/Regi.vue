@@ -1,19 +1,24 @@
 <template>
 <div class="regi">
-    <el-container >
-        <h1 class="text-center">
-            欢迎注册金刚石文档
-        </h1>
-    </el-container>
-	<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-		<el-form-item label="用户名" prop="name"><el-input style="width:200px"  v-model="ruleForm.name"></el-input></el-form-item>
-		<el-form-item label="密码" prop="pass"><el-input type="password" style="width:200px"  v-model="ruleForm.pass" auto-complete="off"></el-input></el-form-item>
-		<el-form-item label="确认密码" prop="checkPass"><el-input type="password" style="width:200px"  v-model="ruleForm.checkPass" auto-complete="off"></el-input></el-form-item>
-		<el-form-item>
-			<el-button type="primary" @click="submitForm('ruleForm')">注册</el-button>
-			<el-button @click="resetForm('ruleForm')">重置</el-button>
-		</el-form-item>
-	</el-form>
+	<h1 align="center" style="color:white;">欢迎注册福报文档</h1>
+    <el-container class="mid">
+		<el-main class="bc">
+			<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+				<el-form-item  label="用户名" prop="name">
+					<el-input style="width:200px"  v-model="ruleForm.name"></el-input></el-form-item>
+				<el-form-item label="密码" prop="pass">
+					<el-input type="password" style="width:200px"  v-model="ruleForm.pass" auto-complete="off"></el-input></el-form-item>
+				<el-form-item label="确认密码" prop="checkPass">
+					<el-input type="password" style="width:200px"  v-model="ruleForm.checkPass" auto-complete="off"></el-input></el-form-item>
+				<el-form-item label="电子邮箱" prop="checkPass">
+					<el-input type="email" style="width:200px"  v-model="ruleForm.email" auto-complete="off"></el-input></el-form-item>
+				<el-form-item>
+					<el-button type="primary" @click="submitForm('ruleForm')">注册</el-button>
+					<el-button @click="resetForm('ruleForm')">重置</el-button>
+				</el-form-item>
+			</el-form>
+		</el-main>
+	</el-container>
 </div>
 </template>
  
@@ -64,9 +69,8 @@ export default {
 						type: 'success',
 						message: '注册成功'
 					});
-					// this.activeName: 'first',
 				} else {
-					console.log('error submit!!');
+					console.log('注册失败');
 					return false;
 				}
 			});
@@ -78,3 +82,30 @@ export default {
 	}
 };
 </script>
+<style scoped>
+.regi
+{
+    width:100%;
+    height:100%;
+    z-index:-1;
+    position:fixed;
+    background-image:url("../assets/regi.png");
+    position: fixed;
+    background-size: 100% 100%;
+    overflow-y: auto;
+}
+.mid
+{
+	height:100%;
+}
+.bc
+{
+	background-color:white;
+	margin-left:41%;
+	margin-right:40%;
+	margin-top:2%;
+	position: fixed;
+	border-radius:15px;
+}
+
+</style>
