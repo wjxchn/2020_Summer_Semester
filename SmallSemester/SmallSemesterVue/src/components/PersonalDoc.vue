@@ -3,11 +3,13 @@
         <Guider id="navBar" :class="{isFixed:istabBar}"/>
         <main id="mainPart" role="main" class="container">
             <div class="personaldoc">
-                <br>
+                <div style="float:right">
+                <el-input  placeholder="请输入内容" style="width:250px">
+                <el-button  slot="append" icon="el-icon-search"></el-button></el-input>
                 <router-link to='/PlainText_new'>
-                <el-button type="primary" style="float:right" >新建 </el-button>
+                    <el-button type="primary"  >新建 </el-button>
                 </router-link>
-                  
+                </div>
     
                 <h5 fixed="right"> 我的文档 </h5>
                 <span v-html="htmlData">
@@ -36,6 +38,7 @@
                     :data="tableData"
                     style="width: 100%"
                     :row-class-name="tableRowClassName">
+                     <el-table-column type="index" label="序号"></el-table-column>
                     <el-table-column
                     prop="docname"
                     label="文档名"
@@ -74,6 +77,15 @@
                     
                     </el-table-column>
                  </el-table>
+                 <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="1"
+                    :page-sizes="[5, 10, 15, 20]"
+                    :page-size="1"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="3">
+                </el-pagination>
             </div>
         </main>
         <BottomGuider/>
@@ -169,7 +181,6 @@ export default {
 </script>
 
 <style>
-
 .time {
     font-size: 13px;
     color: #999;
@@ -186,28 +197,23 @@ export default {
   .clearfix:after {
       clear: both
   }
-
  .bottom {
     margin-top: 20px;
     line-height: 20px;
   }
-
   .button {
     padding: 0;
     float: right;
   }
-
   .image {
     width: 100%;
     display: block;
   }
-
 p.history {
     text-align: left;
     color:gray;
     font-size: 15px;
 }
-
 .isFixed {
     position: fixed;
     top: 0;
