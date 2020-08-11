@@ -86,3 +86,9 @@ var vm = {
 }
 export default vm;
 </script>
+
+<style src="../assets/css/lib/font-awesome.min.css" scoped></style>
+<style src="../assets/css/lib/themify-icons.css" scoped></style>
+<style src="../assets/css/lib/sidebar.css" scoped></style>
+<style src="../assets/css/lib/simdahs.css" scoped></style>
+<style src="../assets/css/style.css" scoped></style>
