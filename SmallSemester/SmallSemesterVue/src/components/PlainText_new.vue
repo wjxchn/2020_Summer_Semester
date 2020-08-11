@@ -3,17 +3,42 @@
         <Guider id="navBar" :class="{isFixed:istabBar}"/>
         <main id="mainPart" role="main" class="container">
             <div class="plaintext_new">
-            <h1>富文本编辑器 <span class="badge badge-secondary">测试</span></h1>
-            <quill-editor class="editor"
-            ref="myTextEditor"
-            v-model="content"
-            :options="editorOption"
-            @blur="onEditorBlur($event)"
-            @focus="onEditorFocus($event)"
-            @ready="onEditorReady($event)"
-            @change="onEditorChange($event)">
-            </quill-editor>
-            <button type="button" class="btn btn-primary" @click="submitPlainText">Primary</button>
+            <br>
+                <el-form ref="form" :model="form" label-width="80px">
+                <el-form-item label="文档名">
+                    <el-col :span="22">
+                    <el-input v-model="form.doc_name"></el-input>
+                    </el-col>
+                </el-form-item>
+                <el-form-item label="简介">
+                    <el-col :span="22">
+                    <el-input type="textarea" :rows="4"  v-model="form.introduction"></el-input>
+                    </el-col>
+                </el-form-item>
+                <el-form-item label="文件位置">
+                    <el-col :span="20">
+                    <el-input v-model="form.address" value="/个人文档" :disabled=true></el-input>
+                    </el-col>
+                    <el-col class="line" :span="2"></el-col>
+                    <el-col :span="3">
+                    <el-button>更改</el-button>
+                    </el-col>
+                </el-form-item>
+                </el-form>
+                <quill-editor class="editor"
+                ref="myTextEditor"
+                v-model="content"
+                style="height:400px"
+                :options="editorOption"
+                @blur="onEditorBlur($event)"
+                @focus="onEditorFocus($event)"
+                @ready="onEditorReady($event)"
+                @change="onEditorChange($event)">
+                </quill-editor>
+
+                <br><br><br>
+                 <el-button type="primary" class="btn btn-primary" style="float:right" @click="submitPlainText" plain>提交</el-button>
+
   </div>
         </main>
         <BottomGuider/>
@@ -34,7 +59,9 @@ export default {
         return {
             istabBar: false,
             content: null,
+            form:null,
             editorOption: {
+
                 modules: {
                 toolbar: [
                     ["bold", "italic", "underline", "strike"], // 加粗 斜体 下划线 删除线
@@ -50,14 +77,19 @@ export default {
                     [{ font: [] }], // 字体种类
                     [{ align: [] }], // 对齐方式
                     ["clean"], // 清除文本格式
-                    ["link", "image", "video"] // 链接、图片、视频
+                    ["link", "image"] // 链接、图片、视频
                 ], //工具菜单栏配置
                 },
-                placeholder: '请在这里添加产品描述', //提示
+                placeholder: '请在此输入正文', //提示
                 readyOnly: false, //是否只读
                 theme: 'snow', //主题 snow/bubble
                 syntax: true, //语法检测
-        }
+        },
+             form: {
+                doc_name: '',
+                introduction:'',
+                address:''
+                 }
         }
     },
     methods: {

@@ -3,10 +3,35 @@
         <Guider id="navBar" :class="{isFixed:istabBar}"/>
         <main id="mainPart" role="main" class="container">
             <div class="personaldoc">
-                <h1> 特朗普 的个人文档 </h1>
+                <br>
+                <router-link to='/PlainText_new'>
+                <el-button type="primary" style="float:right" >新建 </el-button>
+                </router-link>
+                  
+    
+                <h5 fixed="right"> 我的文档 </h5>
                 <span v-html="htmlData">
                     {{htmlData}}
                 </span>
+                <br>
+                <p class="history"> 最近浏览 </p>
+                
+                <el-row>
+                     <el-col :span="8" v-for="(o, index) in 1" :key="o" :offset="index > 0 ? 2 : 0">
+                <el-card class="box-card">
+                <img src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2170127953,2276382196&fm=26&gp=0.jpg" class="image">
+                <div class="card">
+                    <span>最近的文档</span>
+                    <div class="bottom clearfix">
+                    <time class="time">{{ FileTime }}</time>
+                    <el-button type="text" class="button">操作按钮</el-button>
+                    </div>
+                </div>
+                </el-card>
+        </el-col>
+        </el-row>
+
+                <hr>
                 <el-table
                     :data="tableData"
                     style="width: 100%"
@@ -22,10 +47,16 @@
                     label="创建者"
                     width="180">
                     </el-table-column>
+                     <el-table-column
+                    fixed="right"
+                    prop="belong"
+                    label="所属团队"
+                    width="180">
+                    </el-table-column>
                     <el-table-column
                     fixed="right"
                     prop="creation_time"
-                    label="创建时间"
+                    label="最近打开"
                     width="180">
                     </el-table-column>  
                      <el-table-column
@@ -60,20 +91,24 @@ export default {
     },
     data () {
         return {
+            FileTime:'2020-8-11 12:00',
             tableData:[{
                 docname:'高尔夫中的治国理念',
                 creator:'Trump',
-                creation_time:'2020-8-10',
+                belong:'The White House',
+                creation_time:'2020-8-11 12:00',
                 docid:'1'
             },{
                 docname:'Nobody can know better than me',
                 creator:'Trump',
-                creation_time:'2020-8-10',
+                belong:'The White House',
+                creation_time:'2020-8-11 12:00',
                 docid:'2'
             },{
                 docname:'Make America Great Again!',
                 creator:'Trump',
-                creation_time:'2020-8-10',
+                belong:'The White House',
+                creation_time:'2020-8-11 12:00',
                 docid:'3'
             }],
             istabBar: false
@@ -134,6 +169,45 @@ export default {
 </script>
 
 <style>
+
+.time {
+    font-size: 13px;
+    color: #999;
+  }
+.box-card{
+    width: 250px;
+}
+  .clearfix:before,
+  .clearfix:after {
+      display: table;
+      content: "";
+  }
+  
+  .clearfix:after {
+      clear: both
+  }
+
+ .bottom {
+    margin-top: 20px;
+    line-height: 20px;
+  }
+
+  .button {
+    padding: 0;
+    float: right;
+  }
+
+  .image {
+    width: 100%;
+    display: block;
+  }
+
+p.history {
+    text-align: left;
+    color:gray;
+    font-size: 15px;
+}
+
 .isFixed {
     position: fixed;
     top: 0;
