@@ -30,8 +30,8 @@
                     <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><i class="el-icon-notebook-2"></i><a href="/workplat" class="guider-black">工作台</a></div>
                     <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><i class="el-icon-chat-line-round"></i><a href="/message" class="guider-black">收件箱（附加内容）</a></div>
                     <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><i class="el-icon-monitor"></i><a href="/personaldoc" class="guider-black">个人文档</a></div>
-                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><i class="el-icon-edit"></i><a href="/help" class="guider-black">富文本编辑器</a></div>
-                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><i class="el-icon-view"></i><a href="/help" class="guider-black">显示富文本</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><i class="el-icon-edit"></i><a href="/plaintext_new" class="guider-black">富文本编辑器</a></div>
+                    <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><i class="el-icon-view"></i><a href="/showplaintext_new" class="guider-black">显示富文本</a></div>
                     <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><i class="el-icon-user"></i><a href="/team" class="guider-black">我的团队</a></div>
                     <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><i class="el-icon-delete"></i><a href="/recycler" class="guider-black">回收站</a></div>
                     <div class="col-6 col-sm-3 col-md-2 col-lg-2 col-xl-2 unfold-link"><i class="el-icon-help"></i><a href="/help" class="guider-black">使用帮助</a></div>
