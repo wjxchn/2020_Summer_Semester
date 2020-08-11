@@ -106,16 +106,12 @@ def createuser(request):
     username = request_dict.get('username')
     password = request_dict.get('password')
     email = request_dict.get('email')
-    birthday = request_dict.get('birthday')
-    address = request_dict.get('address')
     checkuser = models.User.objects.filter(username = username)
     if checkuser.exists():
         ret_dict = {'code': 400, 'msg': "用户已存在"}
         return JsonResponse(ret_dict)        
     else:       
-        user = User.objects.create_user(username=username, password=password, email=email, is_active = 0)
-        user.extension.birthday = birthday
-        user.extension.address = address
+        user = User.objects.create_user(username=username, password=password, email=email)
         user.save()
         ret_dict = {'code': 200, 'msg': "创建用户成功"}
         return JsonResponse(ret_dict)
@@ -127,14 +123,10 @@ def login(request):
     password = request_dict.get('password')
     user = authenticate(username=username, password=password)
     if user is not None:
-        if user.is_active:
-            ret_dict = {'code': 200, 'msg': "登录成功"}
-            return JsonResponse(ret_dict)            
-        else:
-            ret_dict = {'code': 401, 'msg': "用户需要激活"}
-            return JsonResponse(ret_dict)
+        ret_dict = {'code': 200, 'msg': "登录成功"}
+        return JsonResponse(ret_dict)            
     else:
-        ret_dict = {'code': 402, 'msg': "账号或密码错误"}
+        ret_dict = {'code': 400, 'msg': "账号或密码错误"}
         return JsonResponse(ret_dict)
 
 def changepassword(request):
@@ -177,32 +169,3 @@ def verifyuser(request):
     else:
         ret_dict = {'code': 401, 'msg': "账号或密码错误"}
         return JsonResponse(ret_dict)
-
-def changeuserinfo(request): 
-    request_data = request.body
-    request_dict = json.loads(request_data.decode('utf-8'))
-    username = request_dict.get('username')
-    password = request_dict.get('password')
-    birthday = request_dict.get('birthday')
-    address = request_dict.get('address')
-    authuser = authenticate(username=username, password=password)
-    if authuser is not None:
-        user = models.User.objects.get(username = username)
-        user.extension.birthday = birthday
-        user.extension.address = address
-        user.save()
-        ret_dict = {'code': 200, 'msg': "修改成功"}
-        return JsonResponse(ret_dict) 
-    else:
-        ret_dict = {'code': 400, 'msg': "账号或密码错误"}
-        return JsonResponse(ret_dict)
-
-def addageandphone(request):
-    request_data = request.body
-    request_dict = json.loads(request_data.decode('utf-8'))
-    age = request_dict.get('age')
-    phonenumber = request_dict.get('phonenumber')
-    newtest3 = Test3(age = age, phonenumber = phonenumber)
-    newtest3.save()
-    ret_dict = {'code': 200, 'msg': "添加年龄和电话成功"}
-    return JsonResponse(ret_dict)

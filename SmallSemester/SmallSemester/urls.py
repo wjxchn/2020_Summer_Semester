@@ -17,8 +17,6 @@ urlpatterns = [
     url(r'^api/login/$', api.login),
     url(r'^api/changepassword/$', api.changepassword),
     url(r'^api/verifyuser/$', api.verifyuser),
-    url(r'^api/changeuserinfo/$', api.changeuserinfo),
-    url(r'^api/addageandphone/$', api.addageandphone),
     url(r'^admin/', admin.site.urls),
     url(r'^', TemplateView.as_view(template_name="index.html")),
 ]
