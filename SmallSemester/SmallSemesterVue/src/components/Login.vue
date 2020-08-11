@@ -5,25 +5,24 @@
         <div class="loginbody">
           <el-image style="height:120px;width:350px" :src="'http://r.photo.store.qq.com/psc?/V143D3j445iBwL/45NBuzDIW489QBoVep5mcSvMd8hkV3G1vEW70bFpO7JTUQ723yi1Jhbhp1hlQxNVY0eXGtq17lrGf0NKyfp9YeeeHqL9wN2L3Mqqu7lECW8!/r'"></el-image>
           <el-form :model="ruleForm2" :rules="rules2" status-icon ref="ruleForm2">
-            <el-form-item prop="username">
+            <el-form-item label-width="40px" style="width:310px" prop="username">
                 <el-input type="text" v-model="ruleForm2.username" auto-complete="off" placeholder="用户名"></el-input>
             </el-form-item>
-            <el-form-item prop="password">
+            <el-form-item label-width="40px" style="width:310px" prop="password">
                 <el-input type="password" v-model="ruleForm2.password" auto-complete="off" placeholder="密码"></el-input>
+            </el-form-item >
+            <el-form-item label-width="100px">
+              <el-button type="primary" @click="handleSubmit" :loading="logining">登录</el-button>
+              <el-button type="primary" @click="Guider" :loading="logining">返回</el-button>
             </el-form-item>
-            <el-form-item >
-                <el-button type="primary" @click="handleSubmit" :loading="logining">登录</el-button>
-            </el-form-item>
-            <el-form-item >
-                <el-button type="primary" @click="Regi" :loading="logining">注册</el-button>
-            </el-form-item>
-            <el-form-item >
-                <el-button type="primary" @click="Guider" :loading="logining">返回</el-button>
-            </el-form-item>
-            <el-form-item >
+            <el-form-item label-width="105px" >
                 <el-checkbox v-model="checked" class="rememberme">记住密码</el-checkbox>
                 <el-button type="text" @click="forgetpassword">忘记密码</el-button>
             </el-form-item>
+            <el-form-item label="还未注册？点击此处注册" label-width="270px">
+                <el-button type="primary" @click="Regi" :loading="logining">注册</el-button>
+            </el-form-item>
+            
           </el-form>
         </div>
     </div>
