@@ -5,9 +5,9 @@
         <div class="bottom-guider-border-style border-top">
             <div class="container">
                 <p class="bottom-guider-text">@2020 WJX<br/>This is used only for learning. Commertial use is not allowed.<br/><br/>
-                <a href="#" class="bottom-guider-link">About us</a>
-                <a href="#" class="bottom-guider-link">User guide</a>
-                <a href="#" class="bottom-guider-link">Feedback</a></p>
+                <a href="#" >About us</a>
+                <a href="#" >User guide</a>
+                <a href="#" >Feedback</a></p>
             </div>
         </div>
     </div>
@@ -37,8 +37,5 @@ export default {
 .bottom-guider-text{
     font-size: 10px;
     color: black;
-}
-.bottom-guider-link{
-    margin-right: 20px;
 }
 </style>
