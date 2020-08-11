@@ -3,20 +3,21 @@
     <div class="bc">
 		<h3 align="center" >加入我们</h3>
 		<el-image style="height:120px;width:350px" :src="'http://r.photo.store.qq.com/psc?/V143D3j445iBwL/45NBuzDIW489QBoVep5mcSvMd8hkV3G1vEW70bFpO7JTUQ723yi1Jhbhp1hlQxNVY0eXGtq17lrGf0NKyfp9YeeeHqL9wN2L3Mqqu7lECW8!/r'"></el-image>
-		<el-form :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-ruleForm">
+		<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
 			<el-form-item  label="用户名" prop="name">
-				<el-input v-model="ruleForm.name"></el-input></el-form-item>
+				<el-input style="width:240px" v-model="ruleForm.name"></el-input></el-form-item>
 			<el-form-item label="密码" prop="pass">
-				<el-input type="password" v-model="ruleForm.pass" auto-complete="off"></el-input></el-form-item>
+				<el-input type="password" style="width:240px" v-model="ruleForm.pass" auto-complete="off"></el-input></el-form-item>
 			<el-form-item label="确认密码" prop="checkPass">
-				<el-input type="password" v-model="ruleForm.checkPass" auto-complete="off"></el-input></el-form-item>
-			<el-form-item label="电子邮箱" prop="checkPass">
-				<el-input type="email" v-model="ruleForm.email" auto-complete="off"></el-input></el-form-item>
-			<el-button-group>
-				<el-button type="primary" @click="submitForm('ruleForm')">注册</el-button>
-				<el-button type="primary" @click="resetForm('ruleForm')">重置</el-button>
-				<el-button type="primary" @click="Guider">返回</el-button>
-			</el-button-group>
+				<el-input type="password" style="width:240px" v-model="ruleForm.checkPass" auto-complete="off"></el-input></el-form-item>
+			<el-form-item label="电子邮箱" prop="email">
+				<el-input type="email" style="width:240px" v-model="ruleForm.email" auto-complete="off"></el-input></el-form-item>
+			<el-form-item label-width="50px"><el-button-group >
+		
+				<el-button type="primary" style="width:82px" @click="submitForm('ruleForm')">注册</el-button>
+				<el-button type="primary" style="width:82px" @click="resetForm('ruleForm')">重置</el-button>
+				<el-button type="primary" style="width:82px" @click="Guider">返回</el-button>
+			</el-button-group></el-form-item>
 		</el-form>
 	</div>
 </div>
@@ -45,6 +46,19 @@ export default {
 				callback();
 			}
 		};
+		var validateEmail = (rule, value, callback) => {
+        	if (value === '') {
+          		callback(new Error('请正确填写邮箱'));
+       		} else {
+          	if (value !== '') { 
+            	var reg=/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+            	if(!reg.test(value)){
+              	callback(new Error('请输入有效的邮箱'));
+            	}
+          	}
+          	callback();
+        }
+    };
 		return {
 			activeName: 'second',
 			ruleForm: {
@@ -56,7 +70,8 @@ export default {
 			rules: {
 				name: [{ required: true, message: '请输入您的名称', trigger: 'blur' }, { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }],
 				pass: [{ required: true, validator: validatePass, trigger: 'blur' }],
-				checkPass: [{ required: true, validator: validatePass2, trigger: 'blur' }]
+				checkPass: [{ required: true, validator: validatePass2, trigger: 'blur' }],
+				email:[{ required: true, validator: validateEmail, trigger: 'blur' }]
 			},
 			value:1
 		};
