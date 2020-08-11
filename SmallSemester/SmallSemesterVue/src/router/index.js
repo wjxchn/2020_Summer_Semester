@@ -16,6 +16,7 @@ const routerOptions = [
   { path: '/personaldoc', component:'PersonalDoc'},
   { path: '/team', component:'Team'},
   { path: '/createteam' , component: 'CreateTeam'},
+  { path: '/trash' , component: 'Trash'},
   { path: '*', component: 'NotFound' },
 ]
 
