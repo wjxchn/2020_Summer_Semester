@@ -15,6 +15,7 @@ const routerOptions = [
   { path: '/showplaintext_new', component:'ShowPlainText_new'},
   { path: '/personaldoc', component:'PersonalDoc'},
   { path: '/team', component:'Team'},
+  { path: '/teammanagement', component:'TeamManagement'},
   { path: '/createteam' , component: 'CreateTeam'},
   { path: '/trash' , component: 'Trash'},
   { path: '*', component: 'NotFound' },
