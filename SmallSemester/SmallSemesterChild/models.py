@@ -14,3 +14,45 @@ class Test3(models.Model):
 
 class Plain(models.Model):
     plainname = models.TextField()
+
+class Group(models.Model):
+    creater = models.TextField()  #foreign
+    groupid = models.IntegerField(primary_key = True , default = 0)
+    group_name = models.TextField()
+    introduction = models.TextField()
+
+class Document(models.Model):
+    doc_name = models.TextField()
+    doc_id = models.IntegerField(primary_key = True , default = 0)
+    doc_content = models.TextField()
+    introduction = models.TextField()
+    time = models.DateTimeField(auto_now = True)
+    doc_groupid = models.IntegerField(null=True,blank=True)   #foreign
+    doc_creater = models.IntegerField(null=True,blank=True)   #foreign
+    isin_recycle = models.BooleanField()
+
+class Comment(models.Model):
+    com_content = models.TextField()
+    time = models.DateTimeField(auto_now = True)
+    com_author = models.TextField()  #foreign
+    com_id = models.IntegerField(primary_key = True , default = 0) 
+    doc_id = models.IntegerField()     #foreign
+
+class Demo(models.Model):
+    demo_id = models.IntegerField(primary_key = True , default = 0) 
+    demo_content = models.TextField()
+
+class Browse(models.Model):
+    browse_time = models.DateTimeField(auto_now = True)
+    browse_id = models.IntegerField(primary_key = True , default = 0) 
+    username = models.TextField()   #foreign
+    doc_id = models.IntegerField()    #foreign
+
+class Belong(models.Model):
+    group_id = models.IntegerField()   #foreign
+    username = models.TextField()   #foreign
+
+class Favorite(models.Model):
+    doc_id = models.IntegerField()      #foreign
+    username = models.TextField()   #foreign
+
