@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 const routerOptions = [
-  { path: '/', component: 'Carousel' },
+  { path: '/', component: 'PersonalDoc' },
   { path: '/animation', component: 'Animation' },
   { path: '/article', component: 'Article' },
   { path: '/bottomguider', component: 'BottomGuider' },

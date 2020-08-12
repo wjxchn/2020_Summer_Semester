@@ -73,6 +73,7 @@ export default {
                 console.log(response)
                 if(response.data.code===200){
                     localStorage.setItem('username', this.ruleForm2.username);
+                    localStorage.setItem('playcookie', true);
                     this.$router.push('/')
                 }
                 else if(response.data.code===400){
