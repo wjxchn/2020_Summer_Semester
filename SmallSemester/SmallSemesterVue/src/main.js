@@ -20,13 +20,6 @@ Vue.use(Element)
 
 import verify from "vue-verify-plugin";
 
-import './assets/css/lib/font-awesome.min.css'
-import './assets/css/lib/themify-icons.css'
-
-import './assets/css/lib/sidebar.css'
-
-import './assets/css/lib/simdahs.css'
-import './assets/css/style.css'
 
 var myRules={
   agecheck:{
