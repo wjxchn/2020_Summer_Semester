@@ -82,7 +82,7 @@
                     </el-table-column>
                     <el-table-column
                     fixed="right"
-                    prop="creator"
+                    prop="creater"
                     label="创建者"
                     width="180">
                     </el-table-column>
@@ -94,7 +94,7 @@
                     </el-table-column>
                     <el-table-column
                     fixed="right"
-                    prop="creation_time"
+                    prop="createtime"
                     label="最近打开"
                     width="180">
                     </el-table-column>  
@@ -105,9 +105,9 @@
                     
                     <template slot-scope="scope">
                     
-                        <el-button @click="handleClick(scope.row)" type="primary"><v class="el-icon-view"></v></el-button>
-                        <el-button type="primary" ><v class="el-icon-edit"></v></el-button>
-                        <el-button type="danger"  @click="open"><v class="el-icon-delete"></v></el-button>
+                        <el-button @click="handleview(scope.row)" type="primary"><v class="el-icon-view"></v></el-button>
+                        <el-button @click="handleedit(scope.row)" type="primary" ><v class="el-icon-edit"></v></el-button>
+                        <el-button @click="handledelete(scope.row)" type="danger"><v class="el-icon-delete"></v></el-button>
                     
                     </template>
                     
@@ -132,6 +132,7 @@
 
 <script>
 import Guider from '../components/Guider'
+import axios from 'axios'
 import BottomGuider from '../components/BottomGuider'
 export default {
     name: 'PersonalDoc',
@@ -139,30 +140,34 @@ export default {
         Guider,
         BottomGuider
     },
+    
     data () {
         return {
             FileTime:'2020-8-11 12:00',
-            tableData:[{
-                docname:'高尔夫中的治国理念',
-                creator:'Trump',
-                belong:'The White House',
-                creation_time:'2020-8-11 12:00',
-                docid:'1'
-            },{
-                docname:'Nobody can know better than me',
-                creator:'Trump',
-                belong:'The White House',
-                creation_time:'2020-8-11 12:00',
-                docid:'2'
-            },{
-                docname:'Make America Great Again!',
-                creator:'Trump',
-                belong:'The White House',
-                creation_time:'2020-8-11 12:00',
-                docid:'3'
-            }],
+            tableData:[],
             istabBar: false
         }
+    },
+    created:function(){
+        axios({
+                method: 'post',
+                url: 'http://localhost:8000/api/showpersonaldoclist/',
+                data: {'username': localStorage.getItem('username')}
+            })
+            .then(response => {
+                console.log(response)
+                if(response.data.code===200){
+                    this.$set(this,'tableData',response.data.list)
+                }
+                else if(response.data.code===400){
+                    alert('文件不存在')
+                    this.$router.go(0)
+                }
+                else{
+                    alert('错误')
+                    this.$router.go(0)
+                }
+            })
     },
     methods: {
         //侧边栏的跳转
@@ -221,23 +226,47 @@ export default {
             }
             return '';
         },
+
+        handleedit(row){
+            console.log(row.docid)//此时就能拿到整行的信息
+            this.$router.push({path: '/editpersonaldoc', query: {doc_id: row.docid}})
+        },
+
         //删除文档
-        open(){
-            this.$confirm('删除后此文件将移入回收站，是否继续？','提示',{
-                confirmButtonText:'确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          });
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });         
-        });
+        handledelete(row){
+            console.log(row);
+            axios({
+                method: 'post',
+                url: 'http://localhost:8000/api/takedoctorecycle/',
+                data: {'docid':row.docid}
+            })
+            .then(response => {
+                console.log(response)
+                if(response.data.code===200){
+
+                    this.$confirm('删除后此文件将移入回收站，是否继续？','提示',{
+                        confirmButtonText:'确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                        })
+                    .then(() => {
+                        this.$message({type: 'success',message: '删除成功!'});
+                        this.$router.go(0)
+                    })
+                    .catch(() => {
+                        this.$message({type: 'info',message: '已取消删除'});         
+                    });
+
+                }
+                else if(response.data.code===400){
+                    alert('文件不存在')
+                    this.$router.go(0)
+                }
+                else{
+                    alert('错误')
+                    this.$router.go(0)
+                }
+            })
     },
     mounted () {
         window.addEventListener('scroll', this.handleScroll); // Dom树加载完毕
