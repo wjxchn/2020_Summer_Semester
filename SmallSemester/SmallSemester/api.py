@@ -407,7 +407,7 @@ def show_personal_doclist(request):
         alist = []
         for doc in doclist:
             if doc.isin_recycle == False:
-                alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time,'creater':doc.doc_creater})
+                alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time,'creator':doc.doc_creater})
         ret_dict = {'code': 200, 'msg': "个人文档页面加载成功",'list':alist}
         return JsonResponse(ret_dict)
     else:
