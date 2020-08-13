@@ -210,19 +210,23 @@ def show_personal_doc(request):
         
         docid = request_dict.get('doc_id')
         username = request_dict.get('username')
-        doc = Document.objects.get(doc_id = docid)
-        doc_dict = {'docid': doc.doc_id, 'doc_name': doc.doc_name, 'doc_creater': doc.doc_creater, 'doc_intro': doc.introduction, 'doc_content': doc.doc_content}
-
-        browse_object = Browse.objects.all().aggregate(Max('browse_id'))
-        if browse_object.exists():
-            browse_id = browse_object.browse_id + 1
+        doc_list = Document.objects.filter(doc_id = int(docid))
+        if doc_list.exists() :
+            doc = doc_list.first()
+            doc_dict = {'docid': doc.doc_id, 'doc_name': doc.doc_name, 'doc_creater': doc.doc_creater, 'doc_intro': doc.introduction, 'doc_content': doc.doc_content}
+            browse_object = Browse.objects.filter()
+            if browse_object.exists():
+                res = Browse.objects.all().aggregate(Max('browse_id'))
+                browse_id = int(res['browse_id__max'])+1
+            else:
+                browse_id = 0
+                browse = Browse(browse_id = browse_id, username = username, doc_id = docid)
+                browse.save()
+            ret_dict = {'code':200,'msg':"查看文档成功",'doc':doc_dict}
+            return JsonResponse(doc_dict)
         else:
-            browse_id = 0
-        
-        browse = Browse(browse_id = browse_id, username = username, doc_id = docid)
-        browse.save()
-
-        return JsonResponse(doc_dict)
+            ret_dict = {'code': 401, 'msg': "查看文档失败"}
+            return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "查看文档失败"}
         return JsonResponse(ret_dict)
@@ -234,18 +238,10 @@ def change_personal_doc(request):
         request_dict = json.loads(request_data.decode('utf-8'))
 
         docid = request_dict.get('doc_id')
-        docname = request_dict.get('doc_name')
-        doccreater = request_dict.get('doc_creater')
-        docintro = request_dict.get('doc_intro')
-        doccontent = request_dict.get('doc_content')
+        content = request_dict.get('content')
 
         doc = Document.objects.get(doc_id = docid)
-
-        doc.doc_name = docname
-        doc.doc_creater = doccreater
-        doc.introduction = docintro
-        doc.doc_content = doccontent
-
+        doc.doc_content = content
         doc.save()
 
         ret_dict = {'code': 200, 'msg': "修改文档成功"}
@@ -370,14 +366,14 @@ def take_doc_to_recycle(request):
         request_dict = json.loads(request_data.decode('utf-8'))
 
         docid = request_dict.get('docid')
-        document_object = Document.objects.get(doc_id = docid)
-        if document_object.exists():
+        document_object = Document.objects.filter(doc_id = docid).first()
+        if document_object :
             document_object.isin_recycle = True
             document_object.save()
             ret_dict = {'code': 200, 'msg': "删除个人文档成功"}
             return JsonResponse(ret_dict)
-        else:
-            ret_dict = {'code': 400, 'msg': "删除个人文档失败"}
+        else :
+            ret_dict = {'code': 404, 'msg': "删除个人文档失败"}
             return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "删除个人文档失败"}
@@ -411,13 +407,13 @@ def show_personal_doclist(request):
         alist = []
         for doc in doclist:
             if doc.isin_recycle == False:
-                alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time, 'creator':doc.doc_creater})
-        ret_dict = {'code': 200, 'msg': "个人文档页面加载成功", 'list': alist}
+                alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time,'creater':doc.doc_creater})
+        ret_dict = {'code': 200, 'msg': "个人文档页面加载成功",'list':alist}
         return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "个人文档页面加载失败"}
         return JsonResponse(ret_dict)
-
+    
 def show_recycle_doclist(request):
     if request.method == 'POST':
         request_data = request.body
