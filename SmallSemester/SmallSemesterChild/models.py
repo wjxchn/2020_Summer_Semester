@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+import datetime
 class Test(models.Model):
     name = models.CharField(max_length=20)
 
@@ -18,6 +19,7 @@ class Plain(models.Model):
 class Group(models.Model):
     creater = models.TextField()  #foreign
     groupid = models.IntegerField(primary_key = True , default = 0)
+    time = models.DateField(auto_now = True)
     group_name = models.TextField()
     introduction = models.TextField()
 
@@ -52,15 +54,20 @@ class Belong(models.Model):
     group_id = models.IntegerField()   #foreign
     username = models.TextField()   #foreign
 
+class Docbelong(models.Model):
+    doc_id = models.IntegerField()      #foreign
+    group_id = models.IntegerField()   #foreign
+
 class Favorite(models.Model):
     doc_id = models.IntegerField()      #foreign
     username = models.TextField()   #foreign
 
 class UserExtension(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='extension')
-    name = models.TextField()
-    sex = models.TextField()
-    selfintro = models.TextField()
+    name = models.TextField(default = '暂无')
+    sex = models.TextField(default = '不公开')
+    birthday = models.DateField(default = datetime.date.today())
+    selfintro = models.TextField(default = '暂无个人简介')
 
 @receiver(post_save,sender=User)
 def create_user_extension(sender,instance,created,**kwargs):
@@ -68,4 +75,3 @@ def create_user_extension(sender,instance,created,**kwargs):
         UserExtension.objects.create(user=instance)
     else:
         instance.extension.save()
-
