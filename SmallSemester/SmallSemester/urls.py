@@ -46,6 +46,7 @@ urlpatterns = [
     url(r'^api/showgroupmemberlist/$',api.show_groupmember_list),
     url(r'^api/show_comment/$',api.show_comment),
     url(r'^api/del_comment/$',api.del_comment),
+    url(r'^api/newgroupdoc/$', api.new_group_doc),
     
     url(r'^admin/', admin.site.urls),
     url(r'^', TemplateView.as_view(template_name="index.html")),

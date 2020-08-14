@@ -290,6 +290,36 @@ def add_personal_doc(request):
         ret_dict = {'code': 400, 'msg': "上传个人文档失败"}
         return JsonResponse(ret_dict)
 
+def new_group_doc(request):
+    if request.method == 'POST':
+        request_data = request.body
+        print(request_data)
+        request_dict = json.loads(request_data.decode('utf-8'))
+        print(request_dict)
+        doc_content = request_dict.get('content')
+        doc_name = request_dict.get('doc_name')
+        introduction = request_dict.get('introduction')
+        doc_creater = request_dict.get('doc_creater')
+        groupid = request_dict.get('group_id')
+        isin_recycle = False
+        findeddoc = Document.objects.filter()
+        if findeddoc.exists():
+            res = Document.objects.all().aggregate(Max('doc_id'))
+            doc_id = int(res['doc_id__max'])+1
+        else:
+            doc_id = 0         
+        doc = Document(doc_name=doc_name, doc_id=doc_id, doc_content=doc_content, introduction=introduction, doc_creater=doc_creater, isin_recycle=isin_recycle)
+        doc.save()
+        
+        db = Docbelong(group_id = groupid, doc_id = doc_id)
+        db.save()
+        
+        ret_dict = {'code': 200, 'msg': "新建团队文档成功"}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "新建团队文档失败"}
+        return JsonResponse(ret_dict)
+
 def create_group(request):
     if request.method == 'POST':
         request_data = request.body
