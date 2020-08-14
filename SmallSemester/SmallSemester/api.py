@@ -482,8 +482,9 @@ def show_group_doclist(request):
 
         alist = []
         for doc in doclist:
-            alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time})
-        return JsonResponse(alist)
+            alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time,'creator':doc.doc_creater})
+        ret_dict = {'code': 200, 'msg': "团队文档页面加载成功", 'doclist':alist}
+        return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "团队文档页面加载失败"}
         return JsonResponse(ret_dict)
@@ -560,7 +561,7 @@ def show_grouplist(request):
         group_name_list=[]
         for belong in belong_list:
             group = Group.objects.get(groupid=belong.group_id)
-            group_name_list.append({'group_name':group.group_name,'group_creator':group.creater,'introduction':group.introduction, 'group_id':group.groupid})
+            group_name_list.append({'group_name':group.group_name,'group_creator':group.creater,'introduction':group.introduction, 'group_id':group.groupid, 'time':group.time})
         print(group_name_list)
         ret_dict = {'code':200, 'msg':"显示团队列表", 'grouplist':group_name_list}
         return JsonResponse(ret_dict)

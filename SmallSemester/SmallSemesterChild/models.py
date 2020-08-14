@@ -18,6 +18,7 @@ class Plain(models.Model):
 class Group(models.Model):
     creater = models.TextField()  #foreign
     groupid = models.IntegerField(primary_key = True , default = 0)
+    time = models.DateTimeField(auto_now = True)
     group_name = models.TextField()
     introduction = models.TextField()
 
