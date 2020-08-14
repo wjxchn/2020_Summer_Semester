@@ -56,5 +56,16 @@ class Favorite(models.Model):
     doc_id = models.IntegerField()      #foreign
     username = models.TextField()   #foreign
 
+class UserExtension(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='extension')
+    name = models.TextField()
+    sex = models.TextField()
+    selfintro = models.TextField()
 
+@receiver(post_save,sender=User)
+def create_user_extension(sender,instance,created,**kwargs):
+    if created:
+        UserExtension.objects.create(user=instance)
+    else:
+        instance.extension.save()
 

@@ -24,7 +24,8 @@ urlpatterns = [
     url(r'^api/addpersonaldoc/$',api.add_personal_doc),
     url(r'^api/creategroup/$',api.create_group),
     url(r'^api/addgroupdoc/$',api.add_group_doc),
-    url(r'^api/deletepersonaldoc/$',api.delete_personal_doc),   
+    url(r'^api/deletepersonaldoc/$',api.delete_personal_doc),
+    url(r'^api/deleteallpersonaldoc/$',api.delete_all_personal_doc),   
     url(r'^api/deletegroupdoc/$',api.delete_group_doc),
     url(r'^api/takedoctorecycle/$',api.take_doc_to_recycle),
     url(r'^api/recoverfromrecycle/$',api.recover_from_recycle),
@@ -41,6 +42,7 @@ urlpatterns = [
     url(r'^api/add_comment/$',api.add_comment),
     url(r'^api/returndemo/$',api.return_demo),
     url(r'^api/latestbrowse/$',api.latest_browse),
+    url(r'^api/removefavoritedoc/$',api.remove_favorite_doc),
 
     url(r'^admin/', admin.site.urls),
     url(r'^', TemplateView.as_view(template_name="index.html")),

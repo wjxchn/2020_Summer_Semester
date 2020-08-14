@@ -178,7 +178,8 @@ def show_personalintro(request):
 
         username = request_dict.get('username')
         user = models.User.objects.get(username = username)
-        user_dict = {'username': user.username, 'email': user.email}
+        user_dict = {'code': 200, 'username': user.username, 'email': user.email, 'name': user.extension.name, 'sex': user.extension.sex, 'intro':
+        user.extension.selfintro}
         return JsonResponse(user_dict)
     else:
         ret_dict = {'code': 400, 'msg': "查看个人信息失败"}
@@ -213,17 +214,18 @@ def show_personal_doc(request):
         doc_list = Document.objects.filter(doc_id = int(docid))
         if doc_list.exists() :
             doc = doc_list.first()
-            doc_dict = {'docid': doc.doc_id, 'doc_name': doc.doc_name, 'doc_creater': doc.doc_creater, 'doc_intro': doc.introduction, 'doc_content': doc.doc_content}
             browse_object = Browse.objects.filter()
             if browse_object.exists():
                 res = Browse.objects.all().aggregate(Max('browse_id'))
                 browse_id = int(res['browse_id__max'])+1
+                browse = Browse(browse_id = browse_id, username = username, doc_id = docid)
+                browse.save()                
             else:
                 browse_id = 0
                 browse = Browse(browse_id = browse_id, username = username, doc_id = docid)
                 browse.save()
-            ret_dict = {'code':200,'msg':"查看文档成功",'doc':doc_dict}
-            return JsonResponse(doc_dict)
+            ret_dict = {'code':200, 'msg':"查看文档成功", 'docid': doc.doc_id, 'doc_name': doc.doc_name, 'doc_creater': doc.doc_creater, 'doc_intro': doc.introduction, 'doc_content': doc.doc_content}
+            return JsonResponse(ret_dict)
         else:
             ret_dict = {'code': 401, 'msg': "查看文档失败"}
             return JsonResponse(ret_dict)
@@ -236,14 +238,15 @@ def change_personal_doc(request):
         request_data = request.body
         print(request_data)
         request_dict = json.loads(request_data.decode('utf-8'))
-
         docid = request_dict.get('doc_id')
         content = request_dict.get('content')
-
+        doc_name = request_dict.get('doc_name')
+        introduction = request_dict.get('introduction')
         doc = Document.objects.get(doc_id = docid)
         doc.doc_content = content
+        doc.doc_name = doc_name
+        doc.introduction = introduction
         doc.save()
-
         ret_dict = {'code': 200, 'msg': "修改文档成功"}
         return JsonResponse(ret_dict)
     else:
@@ -284,14 +287,14 @@ def create_group(request):
 
         creater = request_dict.get('creater')
         name = request_dict.get('name')
-        introduction = request_dict.get('introduction')
-
-        group_object = Group.objects.all().aggregate(Max('doc_groupid'))
+        browse_object = Browse.objects.filter()
+        group_object = Group.objects.filter()
         if group_object.exists():
-            groupid = group_object.groupid + 1
+            res = Group.objects.all().aggregate(Max('doc_groupid'))
+            groupid = int(res['groupid__max'])+1
         else:
             groupid = 0
-        group = Group(group_name = name, creater = creater, introduction = introduction, doc_groupid = groupid)
+        group = Group(group_name = name, creater = creater, doc_groupid = groupid)
         group.save()
         ret_dict = {'code': 200, 'msg': "创建团队成功"}
         return JsonResponse(ret_dict)
@@ -328,15 +331,31 @@ def delete_personal_doc(request):
 
         docid = request_dict.get('docid')
         document_object = Document.objects.get(doc_id = docid)
-        if document_object.exists():
-            document_object.delete()
-            ret_dict = {'code': 200, 'msg': "删除个人文档成功"}
-            return JsonResponse(ret_dict)
-        else:
-            ret_dict = {'code': 400, 'msg': "删除个人文档失败"}
-            return JsonResponse(ret_dict)
+        document_object.delete()
+        ret_dict = {'code': 200, 'msg': "删除个人文档成功"}
+        return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "删除个人文档失败"}
+        return JsonResponse(ret_dict)
+
+def delete_all_personal_doc(request):
+    if request.method == 'POST':
+        request_data = request.body
+        print(request_data)
+        request_dict = json.loads(request_data.decode('utf-8'))
+
+        alist = request_dict.get('list')
+        if len(alist) > 0:
+            for item in alist:
+                print(item)
+                document_object = Document.objects.get(doc_id = item['docid'])
+                document_object.delete()
+            ret_dict = {'code': 200, 'msg': "清空回收站成功"}
+        else:
+            ret_dict = {'code': 300, 'msg': "回收站为空"}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "清空回收站失败"}
         return JsonResponse(ret_dict)
 
 def delete_group_doc(request):
@@ -445,8 +464,9 @@ def show_favorite_doclist(request):
         alist = []
         for doct in doclist:
             doc = Document.objects.get(doc_id = doct.doc_id)
-            alist.append({'docid': doc.doc_id, 'docname': doc.doc_name, 'createtime': doc.time}) 
-        return JsonResponse(alist)
+            alist.append({'doc_id': doc.doc_id, 'docname': doc.doc_name, 'creator':doc.doc_creater,'createtime': doc.time}) 
+        ret_dict = {'code': 200, 'msg': "收藏文档页面加载成功", "alist": alist}
+        return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "收藏文档页面加载失败"}
         return JsonResponse(ret_dict)
@@ -539,11 +559,13 @@ def show_grouplist(request):
         belong_list = Belong.objects.filter(username=username)
         group_name_list=[]
         for belong in belong_list:
-            group = Group.objects.get(groupid=belong.groupid)
-            group_name_list.append({'group_name':group.group_name})
-        return JsonResponse(group_name_list)
+            group = Group.objects.get(groupid=belong.group_id)
+            group_name_list.append({'group_name':group.group_name,'group_creator':group.creater,'introduction':group.introduction, 'group_id':group.groupid})
+        print(group_name_list)
+        ret_dict = {'code':200, 'msg':"显示团队列表", 'grouplist':group_name_list}
+        return JsonResponse(ret_dict)
     else:
-        ret_dict = {'code': 400, 'msg': "显示团队列表"}
+        ret_dict = {'code': 400, 'msg': "显示团队失败"}
         return JsonResponse(ret_dict)
 
 def add_favorite_doc(request):
@@ -626,10 +648,37 @@ def latest_browse(request):
         print(request_data)
         request_dict = json.loads(request_data.decode('utf-8'))
         username = request_dict.get('username')
-        browse = Browse.objects.all().filter(username=username).aggregate(Max('browse_time'))
-        doc = Document.objects.get(doc_id=browse.doc_id)
-        ret_dict = {'code': 200, 'msg': "返回最后浏览成功", 'content':doc.doc_content, 'doc_id':doc.doc_id, 'time':doc_time, 'doc_id':doc.doc_name, 'doc_creater':doc.doc_creater}
+        browse = Browse.objects.filter(username = username).order_by('-browse_time')
+        if browse.exists():
+            checknum = 0
+            browselist = []
+            for item in browse:
+                checknum = checknum+1
+                doc = Document.objects.get(doc_id=item.doc_id)
+                browselist.append({'content':doc.doc_content, 'doc_id':doc.doc_id, 'doc_time':doc.time, 'doc_name':doc.doc_name, 'doc_creater':doc.doc_creater, 'browse_time': item.browse_time})
+                if checknum == 8:
+                    break;
+            ret_dict = {'code': 200, 'msg': "返回最后浏览成功", 'browselistdata': browselist}
+            return JsonResponse(ret_dict)
+        else:
+            ret_dict = {'code': 400, 'msg': "无最后浏览信息"}
+            return JsonResponse(ret_dict)            
+    else:
+        ret_dict = {'code': 401, 'msg': "返回最后浏览失败"}
+        return JsonResponse(ret_dict)
+
+def remove_favorite_doc(request):
+    if request.method == 'POST':
+        request_data = request.body
+        print(request_data)
+        request_dict = json.loads(request_data.decode('utf-8'))
+
+        username = request_dict.get('username')
+        doc_id = request_dict.get('doc_id')
+        Favorite.objects.filter(doc_id=doc_id, username=username).delete()
+
+        ret_dict = {'code': 200, 'msg': "移除收藏成功"}
         return JsonResponse(ret_dict)
     else:
-        ret_dict = {'code': 400, 'msg': "返回最后浏览失败"}
+        ret_dict = {'code': 400, 'msg': "移除收藏失败"}
         return JsonResponse(ret_dict)
