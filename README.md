@@ -1,51 +1,9 @@
 # 2020_Summer_Semester
 
-## 部分文件夹解释
-|-- SmallSemester    工程文件夹
+## 内容说明：
+该文件夹为后端文件夹，需和前端配合使用。
 
-&emsp;|-- SmallSemester &emsp;Django主文件夹
-
-&emsp;&emsp;|-- api.py &emsp;接口的python文件
-
-&emsp;&emsp;|-- settings.py &emsp;Django设置文件
-
-&emsp;&emsp;|-- urls.py &emsp;路径设置文件
-
-&emsp;&emsp;|-- views.py &emsp;渲染vue页面的文件
-
-&emsp;|-- SmallSemesterChild &emsp;Django关于数据库的相关内容的文件夹
-
-&emsp;&emsp;|-- \_\_init\_\_.py &emsp;设置pymysql的文件
-
-&emsp;&emsp;|-- models.py &emsp;设置表的文件
-
-&emsp;|-- SmallSemesterVue &emsp;Vue工程文件夹
-
-&emsp;&emsp;|--src &emsp;vue源文件夹
-
-&emsp;&emsp;&emsp;|--components &emsp;vue组件和页面文件夹
-
-&emsp;&emsp;&emsp;&emsp;|--Animation.vue &emsp;卡片页面
-
-&emsp;&emsp;&emsp;&emsp;|--Article.vue &emsp;文章格式页面
-
-&emsp;&emsp;&emsp;&emsp;|--BottomGuider.vue &emsp;底部关于组件
-
-&emsp;&emsp;&emsp;&emsp;|--Carousel.vue &emsp;轮播图页面，该页面设为主页
-
-&emsp;&emsp;&emsp;&emsp;|--Guider.vue &emsp;导航栏组件
-
-&emsp;&emsp;&emsp;&emsp;|--NotFound.vue &emsp;404页面
-
-&emsp;&emsp;&emsp;&emsp;|--PageDemo.vue &emsp;页面模板，包含导航栏组件和底部关于组件
-
-&emsp;&emsp;&emsp;|--router &emsp;vue路由文件夹
-
-&emsp;|-- UploadFile &emsp;上传的文件保存的文件夹
-
-|-- README.md &emsp;解释文档
-
-## 使用方面的一些事项：
+## 前后端文件使用方面的一些事项：
 
 ### 调试
 调试时，同时创建两个命令行，其中一个命令行位于2020_Summer_Semester/SmallSemester中，并输入以下命令：
