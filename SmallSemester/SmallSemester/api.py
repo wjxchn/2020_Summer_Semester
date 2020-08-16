@@ -227,8 +227,12 @@ def show_personal_doc(request):
                 browse_same_object = Browse.objects.filter(doc_id = docid, username = username)
                 if browse_same_object:
                     browse_same_object.delete()
-                res = Browse.objects.all().aggregate(Max('browse_id'))
-                browse_id = int(res['browse_id__max'])+1
+                browse_obj = Browse.objects.filter()
+                if browse_obj:
+                    res = Browse.objects.all().aggregate(Max('browse_id'))
+                    browse_id = int(res['browse_id__max'])+1
+                else:
+                    browse_id = 0
                 browse = Browse(browse_id = browse_id, username = username, doc_id = docid)
                 browse.save()                
             else:
