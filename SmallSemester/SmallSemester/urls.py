@@ -16,7 +16,6 @@ urlpatterns = [
     url(r'^api/createuser/$', api.createuser),
     url(r'^api/login/$', api.login),
     url(r'^api/changepassword/$', api.changepassword),
-    url(r'^api/verifyuser/$', api.verifyuser),
     url(r'^api/showpersonalintro/$', api.show_personalintro),         
     url(r'^api/changepersonalintro/$', api.change_personalintro),  
     url(r'^api/showpersonaldoc/$',api.show_personal_doc),         
@@ -47,7 +46,12 @@ urlpatterns = [
     url(r'^api/show_comment/$',api.show_comment),
     url(r'^api/del_comment/$',api.del_comment),
     url(r'^api/newgroupdoc/$', api.new_group_doc),
-    
+    url(r'^api/sendverifycode/$', api.sendverifycode),
+    url(r'^api/addbackgroundphoto/$', api.addbackgroundphoto),
+    url(r'^api/addprofilephoto/$', api.addprofilephoto),
+    url(r'^api/showbackgroundphoto/$', api.showbackgroundphoto),
+    url(r'^api/showprofilephoto/$', api.showprofilephoto),
+
     url(r'^admin/', admin.site.urls),
     url(r'^', TemplateView.as_view(template_name="index.html")),
 ]

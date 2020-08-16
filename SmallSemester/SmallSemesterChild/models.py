@@ -63,12 +63,22 @@ class Favorite(models.Model):
     doc_id = models.IntegerField()      #foreign
     username = models.TextField()   #foreign
 
+class Verifycode(models.Model):
+    verify_id = models.IntegerField()
+    username = models.TextField()
+    email = models.TextField()
+    verify_code = models.TextField()
+    verify_time = models.DateTimeField(default = timezone.now)
+    isverify = models.BooleanField(default = False)
+
 class UserExtension(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='extension')
     name = models.TextField(default = '暂无')
     sex = models.TextField(default = '不公开')
     birthday = models.DateField(default=timezone.now)
     selfintro = models.TextField(default = '暂无个人简介')
+    backgroundphoto = models.TextField(null = True)
+    userphoto = models.TextField(null = True)
 
 @receiver(post_save,sender=User)
 def create_user_extension(sender,instance,created,**kwargs):

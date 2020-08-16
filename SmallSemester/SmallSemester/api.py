@@ -1,6 +1,6 @@
 from django.http import JsonResponse,HttpResponse
 import json
-from SmallSemesterChild.models import Test, Plain, Test3, Group, Document, Comment, Demo, Browse, Belong, Docbelong, Favorite
+from SmallSemesterChild.models import Test, Plain, Test3, Group, Document, Comment, Demo, Browse, Belong, Docbelong, Favorite, Verifycode
 from SmallSemesterChild import models
 from SmallSemester import settings,token
 from django.core.mail import send_mail
@@ -8,6 +8,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.db.models.query import EmptyQuerySet
 from django.db.models import Max
+from django.utils import timezone
+import random
+import datetime
+
 def ajax_list(request):
     a = list(range(100))
     return JsonResponse(a, safe=False)
@@ -112,6 +116,8 @@ def createuser(request):
         return JsonResponse(ret_dict)        
     else:       
         user = User.objects.create_user(username=username, password=password, email=email)
+        user.extension.backgroundphoto = "http://r.photo.store.qq.com/psc?/V52Qutst1Ze0TP0BqSlg0Ogc8N1lTYZp/45NBuzDIW489QBoVep5mcWCQKX9WHhAARbvjDHbE5p080qFMB3PE9EKYZm4ixFpGpOz2LgI6LvNURNSZH29x.*XMFGLDpA3riSY4BnJRS8k!/r"
+        user.extension.userphoto = "http://r.photo.store.qq.com/psc?/V143D3j445iBwL/ubiEST8aMMlZjEEUGVmWIvQRktHhz2iAdR3J.A4nqij8aa0.iu6BoAsF9QicJOl2HSbaNWgM8nnAiFqjhgVj6jpHhRfm2MRX08O2SAq4NIQ!/r"
         user.save()
         ret_dict = {'code': 200, 'msg': "创建用户成功"}
         return JsonResponse(ret_dict)
@@ -133,42 +139,33 @@ def changepassword(request):
     request_data = request.body
     request_dict = json.loads(request_data.decode('utf-8'))
     username = request_dict.get('username')
-    oldpassword = request_dict.get('oldpassword')
+    email = request_dict.get('email')
+    verifycode = request_dict.get('verifycode')
     newpassword = request_dict.get('newpassword')
-    user = authenticate(username=username, password=oldpassword)
-    if user is not None:
-        u = User.objects.get(username = username)
-        u.set_password(newpassword)
-        u.save()
-        ret_dict = {'code': 200, 'msg': "修改密码成功"}
-        return JsonResponse(ret_dict)
-    else:
-        ret_dict = {'code': 400, 'msg': "修改密码失败"}
-        return JsonResponse(ret_dict)
-
-def verifyuser(request):
-    request_data = request.body
-    request_dict = json.loads(request_data.decode('utf-8'))
-    username = request_dict.get('username')
-    password = request_dict.get('password')
-    authuser = authenticate(username=username, password=password)
-    if authuser is not None:
-        user = models.User.objects.get(username = username)
-        to_email = user.email
-        mail_title = "激活邮件"
-        msg='<p>您已收到激活邮件，注册账号成功，账号可以使用了。</p><a href="http://localhost:8000/home" target="_blank">点击进入首页</a>'
-        send_status = send_mail(mail_title,'','2424773081@qq.com', [to_email], html_message=msg)
-        if send_status:
-            user.is_active = 1
-            user.save()            
-            ret_dict = {'code': 200, 'msg': "发送激活邮件成功"}
-            return JsonResponse(ret_dict)
+    checkpassword = request_dict.get('checkpassword')
+    user = User.objects.filter(username = username, email = email).first()
+    if user:
+        if newpassword == checkpassword:
+            verify_obj = Verifycode.objects.filter(email = email, verify_code = verifycode).first()
+            if verify_obj:
+                if verify_obj.verify_time >= timezone.now()- datetime.timedelta(minutes=3):
+                    u = User.objects.get(username = username)
+                    u.set_password(newpassword)
+                    u.save()
+                    ret_dict = {'code': 200, 'msg': "修改密码成功"}
+                    return JsonResponse(ret_dict)
+                else:
+                    ret_dict = {'code': 410, 'msg': "验证码超时"}
+                    return JsonResponse(ret_dict)                    
+            else:
+                ret_dict = {'code': 403, 'msg': "验证码错误"}
+                return JsonResponse(ret_dict)                 
         else:
-            ret_dict = {'code': 400, 'msg': "发送激活邮件失败"}
-            return JsonResponse(ret_dict)
+            ret_dict = {'code': 401, 'msg': "两次密码不相同"}
+            return JsonResponse(ret_dict)            
     else:
-        ret_dict = {'code': 401, 'msg': "账号或密码错误"}
-        return JsonResponse(ret_dict)
+        ret_dict = {'code': 402, 'msg': "输入信息有误"}
+        return JsonResponse(ret_dict)            
 
 def show_personalintro(request):
     if request.method == 'POST':
@@ -356,15 +353,16 @@ def add_group_doc(request):
         request_dict = json.loads(request_data.decode('utf-8'))
 
         groupid = request_dict.get('groupid')
-        docid = request_dict.get('docid')
-        document_object = Document.objects.get(doc_id = docid)
-        if document_object.exists():
-            document_object.doc_groupid = groupid
-            document_object.save()
+        item = request_dict.get('item')
+        docid = item['docid']
+        res = Docbelong.objects.filter(group_id = groupid, doc_id = docid)
+        if res.exists():
             ret_dict = {'code': 200, 'msg': "添加团队文档成功"}
             return JsonResponse(ret_dict)
         else:
-            ret_dict = {'code': 400, 'msg': "添加团队文档失败"}
+            db = Docbelong(group_id = groupid, doc_id = docid)
+            db.save()
+            ret_dict = {'code': 200, 'msg': "添加团队文档成功"}
             return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "添加团队文档失败"}
@@ -398,8 +396,12 @@ def delete_all_personal_doc(request):
         if len(alist) > 0:
             for item in alist:
                 print(item)
-                document_object = Document.objects.get(doc_id = item['docid'])
-                document_object.delete()
+                docid = item['docid']
+                Document.objects.filter(doc_id = docid).delete()
+                Comment.objects.filter(doc_id = docid).delete()
+                Browse.objects.filter(doc_id = docid).delete()
+                Favorite.objects.filter(doc_id = docid).delete()
+                Docbelong.objects.filter(doc_id = docid).delete()
             ret_dict = {'code': 200, 'msg': "清空回收站成功"}
         else:
             ret_dict = {'code': 300, 'msg': "回收站为空"}
@@ -510,8 +512,9 @@ def show_favorite_doclist(request):
         alist = []
         for doct in doclist:
             doc = Document.objects.get(doc_id = doct.doc_id)
-            alist.append({'doc_id': doc.doc_id, 'docname': doc.doc_name, 'creator':doc.doc_creater,'createtime': doc.time}) 
-        ret_dict = {'code': 200, 'msg': "收藏文档页面加载成功", "alist": alist}
+            if doc.isin_recycle == False:
+                alist.append({'doc_id': doc.doc_id, 'docname': doc.doc_name, 'creator':doc.doc_creater,'createtime': doc.time}) 
+        ret_dict = {'code': 200, 'msg': "收藏文档页面加载成功", 'alist': alist}
         return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "收藏文档页面加载失败"}
@@ -524,9 +527,9 @@ def leave_group(request):
         request_dict = json.loads(request_data.decode('utf-8'))
 
         username = request_dict.get('username')
-        groupid =  request_dict.get('doc_groupid')
-        belong = Belong.objects.filter(username=username)
-        group = Group.objects.filter(doc_groupid=groupid)
+        groupid =  request_dict.get('groupid')
+        belong = Belong.objects.filter(username=username,group_id=groupid).first()
+        group = Group.objects.filter(groupid=groupid).first()
 
         if username!=group.creater:
             belong.delete()
@@ -536,7 +539,7 @@ def leave_group(request):
             ret_dict = {'code': 400, 'msg': "该用户为小组创建者，不可退出"}
             return JsonResponse(ret_dict)
     else:
-        ret_dict = {'code': 400, 'msg': "退出团队失败"}
+        ret_dict = {'code': 405, 'msg': "退出团队失败"}
         return JsonResponse(ret_dict)
         
 def dismiss_group(request):
@@ -642,16 +645,19 @@ def delete_group_member(request):
         usernameA = request_dict.get('usernameA')  #团队创建者
         usernameB = request_dict.get('usernameB')  #被删除者
         groupid = request_dict.get('groupid')
-        group = Group.objects.get(groupid=groupid)
-        if usernameA == group.creater:
-            Belong.objects.fliter(username=usernameB,groupid=groupid).delete()
-            ret_dict = {'code': 200, 'msg': "踢出团队成功"}
+        group = Group.objects.filter(groupid=groupid).first()
+        if usernameA == group.creater and usernameB!=group.creater:
+            Belong.objects.filter(username=usernameB,group_id=groupid).delete()
+            ret_dict = {'code': 200, 'msg': "删除团队成员成功"}
             return JsonResponse(ret_dict)
-        else:
-            ret_dict = {'code': 400, 'msg': "非团队管理员无权限踢出团队"}
+        elif usernameA != group.creater:
+            ret_dict = {'code': 400, 'msg': "非团队管理员无权限删除团队成员"}
+            return JsonResponse(ret_dict)
+        elif usernameB == group.creater:
+            ret_dict = {'code': 401, 'msg': "无法删除团队创建者"}
             return JsonResponse(ret_dict)
     else:
-        ret_dict = {'code': 400, 'msg': "踢出团队失败"}
+        ret_dict = {'code': 402, 'msg': "删除团队成员失败"}
         return JsonResponse(ret_dict)
 
 def add_comment(request):
@@ -707,7 +713,7 @@ def latest_browse(request):
                 doc = Document.objects.get(doc_id=item.doc_id)
                 browselist.append({'content':doc.doc_content, 'doc_id':doc.doc_id, 'doc_time':doc.time, 'doc_name':doc.doc_name, 'doc_creater':doc.doc_creater, 'browse_time': item.browse_time})
                 if checknum == 8:
-                    break;
+                    break
             ret_dict = {'code': 200, 'msg': "返回最后浏览成功", 'browselistdata': browselist}
             return JsonResponse(ret_dict)
         else:
@@ -731,24 +737,6 @@ def remove_favorite_doc(request):
         return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "移除收藏失败"}
-        return JsonResponse(ret_dict)
-
-def show_favorite_doclist(request):
-    if request.method == 'POST':
-        request_data = request.body
-        print(request_data)
-        request_dict = json.loads(request_data.decode('utf-8'))
-
-        username = request_dict.get('username')
-        favoritelist = Favorite.objects.filter(username=username)
-        favoritedoclist = []
-        for f in favoritelist:
-            doc = Document.objects.filter(doc_id=f.doc_id).first()
-            favoritedoclist.append({'doc_id':doc.doc_id, 'doc_name':doc.doc_name, 'doc_creator':doc.doc_creater, 'createtime': doc.time})
-        ret_dict = {'code': 200, 'msg': "查看收藏成功",'favoritedoclist':favoritedoclist}
-        return JsonResponse(ret_dict)
-    else:
-        ret_dict = {'code': 400, 'msg': "查看收藏失败"}
         return JsonResponse(ret_dict)
 
 def show_groupmember_list(request):
@@ -808,3 +796,93 @@ def del_comment(request):
     else:
         ret_dict = {'code': 400, 'msg': "获取评论失败"}
         return JsonResponse(ret_dict)
+
+def sendverifycode(request):
+    if request.method == 'POST':
+        request_data = request.body
+        print(request_data)
+        request_dict = json.loads(request_data.decode('utf-8'))
+
+        username = request_dict.get('username')
+        email= request_dict.get('email')
+
+        u = User.objects.filter(username = username, email = email)
+        if u:
+            H = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+            salt = ''
+            for i in range(6):
+                salt += random.choice(H)
+            msg='您的验证码为'+salt
+            send_mail('注册激活','','2424773081@qq.com', [email], html_message=msg)
+            v = Verifycode.objects.filter()
+            if v:
+                res = Verifycode.objects.all().aggregate(Max('verify_id'))
+                v_id = int(res['verify_id__max'])+1
+                verify_object = Verifycode(username = username, verify_id = v_id+1, email = email, verify_code = salt)
+                verify_object.save()
+            else:
+                verify_object = Verifycode(username = username, verify_id = 0, email = email, verify_code = salt)
+                verify_object.save()
+            ret_dict = {'code': 200, 'msg': "发送验证邮件成功"}
+            return JsonResponse(ret_dict)
+        else:
+            ret_dict = {'code': 401, 'msg': "用户名或邮箱错误"}
+            return JsonResponse(ret_dict)            
+    else:
+        ret_dict = {'code': 400, 'msg': "发送验证邮件成功"}
+        return JsonResponse(ret_dict)
+
+def addbackgroundphoto(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
+        backgroundphotodata = request_dict.get('backgroundphotodata')
+        user = models.User.objects.get(username = username)
+        user.extension.backgroundphoto =backgroundphotodata
+        user.save()
+
+        ret_dict = {'code': 200, 'msg': "上传背景图片成功"}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "上传背景图片失败"}
+        return JsonResponse(ret_dict)
+
+def addprofilephoto(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
+        profilephotodata = request_dict.get('profilephotodata')
+        user = models.User.objects.get(username = username)
+        user.extension.userphoto =profilephotodata
+        user.save()
+        ret_dict = {'code': 200, 'msg': "上传头像图片成功"}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "上传头像图片失败"}
+        return JsonResponse(ret_dict)
+
+def showbackgroundphoto(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
+        user = models.User.objects.get(username = username)
+        ret_dict = {'code': 200, 'msg': "显示背景图片成功", 'backgroundphotodata': user.extension.backgroundphoto}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "显示背景图片失败"}
+        return JsonResponse(ret_dict)
+
+def showprofilephoto(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
+        user = models.User.objects.get(username = username)
+        ret_dict = {'code': 200, 'msg': "显示头像图片成功", 'profilephotodata': user.extension.userphoto}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "显示头像图片失败"}
+        return JsonResponse(ret_dict)                    
