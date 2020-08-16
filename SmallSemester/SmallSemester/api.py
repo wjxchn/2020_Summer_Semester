@@ -678,6 +678,11 @@ def add_comment(request):
             comment_id = 0
         comment = Comment(com_content=content, com_author=username, doc_id=doc_id, com_id=comment_id)
         comment.save()
+        
+        doc = Document.objects.get(doc_id = doc_id)
+        content = '您的' + doc.doc_name + '文档被人评论。'
+        notify = Notify(username = doc.doc_creater, title = '评论通知', content = content, type = 0)
+        notify.save()
         ret_dict = {'code': 200, 'msg': "添加评论成功"}
         return JsonResponse(ret_dict)
     else:

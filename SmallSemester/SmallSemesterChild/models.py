@@ -63,6 +63,13 @@ class Favorite(models.Model):
     doc_id = models.IntegerField()      #foreign
     username = models.TextField()   #foreign
 
+class Notify(models.Model):
+    username = models.TextField() #foreign
+    title = models.TextField(default = '通知')
+    type = models.IntegerField()
+    content = models.TextField()
+    time = models.DateTimeField(auto_now = True)
+
 class Verifycode(models.Model):
     verify_id = models.IntegerField()
     username = models.TextField()
