@@ -55,7 +55,12 @@ urlpatterns = [
     url(r'^api/getteammessage/$', api.getteammessage),
     url(r'^api/getdocumentmessage/$', api.getdocumentmessage),
     url(r'^api/changeauthority/$', api.changeauthority),
-
+    url(r'^api/checkauthority/$', api.check_authority),
+    url(r'^api/returnusername/$', api.return_user_name),
+    url(r'^api/invite/$', api.invite),
+    url(r'^api/receiveinvitation/$', api.receive_invitation),
+    url(r'^api/accept/$', api.accept),
+    url(r'^api/ignore/$', api.ignore),
     url(r'^admin/', admin.site.urls),
     url(r'^', TemplateView.as_view(template_name="index.html")),
 ]

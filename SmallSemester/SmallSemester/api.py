@@ -342,7 +342,7 @@ def create_group(request):
             groupid = 0
         group = Group(group_name = name, creater = creater, groupid = groupid, introduction = introduction)
         group.save()
-        belong = Belong(username = creater, group_id = groupid)
+        belong = Belong(username = creater, group_id = groupid, authority = 2)
         belong.save()
         ret_dict = {'code': 200, 'msg': "创建团队成功"}
         return JsonResponse(ret_dict)
@@ -422,9 +422,19 @@ def delete_group_doc(request):
 
         docid = request_dict.get('docid')
         groupid = request_dict.get('groupid')
-
-        Docbelong.objects.filter(doc_id = docid, group_id = groupid).delete()
-        ret_dict = {'code': 200, 'msg': "删除团队文档成功"}
+        username = request_dict.get('username')
+        doc = Document.objects.get(doc_id = docid)
+        db = Docbelong.objects.filter(doc_id = docid, group_id = groupid)
+        belongdb = Belong.objects.get(username = username, group_id = groupid)
+        if belongdb.authority > 1:
+            ret_dict = {'code': 200, 'msg': "删除团队文档成功"}
+            db.delete()
+        else:
+            if doc.doc_creater == username:
+                ret_dict = {'code': 200, 'msg': "删除团队文档成功"}
+                db.delete()
+            else:
+                ret_dict = {'code': 300, 'msg': "权限不足"}
         return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "删除团队文档失败"}
@@ -556,9 +566,11 @@ def dismiss_group(request):
         groupid =  request_dict.get('group_id')
         group = Group.objects.filter(groupid=groupid).first()
         belonglist = Belong.objects.filter(group_id=groupid)
+        docbelonglist = Docbelong.objects.filter(group_id = groupid)
         if username==group.creater:
             group.delete()
             belonglist.delete()
+            docbelonglist.delete()
             ret_dict = {'code': 200, 'msg': "解散团队成功"}
             return JsonResponse(ret_dict)
         else:
@@ -650,18 +662,23 @@ def delete_group_member(request):
         usernameB = request_dict.get('usernameB')  #被删除者
         groupid = request_dict.get('groupid')
         group = Group.objects.filter(groupid=groupid).first()
-        if usernameA == group.creater and usernameB!=group.creater:
-            Belong.objects.filter(username=usernameB,group_id=groupid).delete()
-            ret_dict = {'code': 200, 'msg': "删除团队成员成功"}
-            return JsonResponse(ret_dict)
-        elif usernameA != group.creater:
-            ret_dict = {'code': 400, 'msg': "非团队管理员无权限删除团队成员"}
-            return JsonResponse(ret_dict)
-        elif usernameB == group.creater:
-            ret_dict = {'code': 401, 'msg': "无法删除团队创建者"}
-            return JsonResponse(ret_dict)
+        user = Belong.objects.get(username = usernameA, group_id = groupid)
+        tuser = Belong.objects.get(username = usernameB, group_id = groupid)
+        if user.authority == 2:
+            if tuser.authority < 2:
+                tuser.delete()
+                ret_dict = {'code': 200, 'msg': "删除团队成员成功"}
+            else:
+                if usernameA == group.creater and usernameB != group.creater:
+                    tuser.delete()
+                    ret_dict = {'code': 200, 'msg': "删除团队成员成功"}
+                else:
+                    ret_dict = {'code': 402, 'msg': "无法删除团队管理员或团队创建者"}
+        else:
+            ret_dict = {'code': 401, 'msg': "没有权限删除团队成员"}
+        return JsonResponse(ret_dict)
     else:
-        ret_dict = {'code': 402, 'msg': "删除团队成员失败"}
+        ret_dict = {'code': 400, 'msg': "删除团队成员失败"}
         return JsonResponse(ret_dict)
 
 def add_comment(request):
@@ -891,7 +908,7 @@ def showprofilephoto(request):
         return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "显示头像图片失败"}
-        return JsonResponse(ret_dict)
+        return JsonResponse(ret_dict)    
 
 def getsystemmessage(request):
     if request.method == 'POST':
@@ -946,13 +963,133 @@ def changeauthority(request):
         request_data = request.body
         request_dict = json.loads(request_data.decode('utf-8'))
         username = request_dict.get('username')
+        tusername = request_dict.get('targetusername')
         authority = request_dict.get('authority')
         group_id = request_dict.get('group_id')
-        belong_obj = Belong.objects.get(username = username, group_id = group_id)
-        belong_obj.authority = authority
-        belong_obj.save()
-        ret_dict = {'code': 200, 'msg': "修改权限成功"}
+        group = Group.objects.get(groupid = group_id)
+        user = Belong.objects.get(username = username, group_id = group_id)
+        tuser = Belong.objects.get(username = tusername, group_id = group_id)
+        if user.authority == 2:
+            if username == group.creater:
+                if tusername == group.creater:
+                    ret_dict = {'code': 402, 'msg': "无法修改团队创建者权限"}
+                else:
+                    tuser.authority = authority
+                    tuser.save()
+                    ret_dict = {'code': 200, 'msg': "修改权限成功"}
+            else:
+                if tusername == group.creater:
+                    ret_dict = {'code': 402, 'msg': "无法修改团队创建者权限"}
+                else:
+                    if tuser.authority == 2:
+                        ret_dict = {'code': 403, 'msg': "无法修改管理员权限"}
+                    else:
+                        tuser.authority = authority
+                        tuser.save()
+                        ret_dict = {'code': 200, 'msg': "修改权限成功"}
+        else:
+            ret_dict = {'code': 401, 'msg': "无法修改团队成员权限"}
         return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "修改权限失败"}
-        return JsonResponse(ret_dict)                          
+        return JsonResponse(ret_dict)   
+
+def check_authority(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+
+        username = request_dict.get('username')
+        groupid = request_dict.get('group_id')      
+        belongdb = Belong.objects.get(username = username, group_id = groupid)
+        ret_dict = {'code': 200, 'authority': belongdb.authority, 'msg': "查看权限成功"}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "查看权限失败"}
+        return JsonResponse(ret_dict)
+
+def return_user_name(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        keyword = request_dict.get('keyword')
+        groupid = request_dict.get('groupid')
+        userlist =  models.User.objects.filter(username__icontains=keyword)
+        relist = []
+        for user in userlist:
+            isbelong = Belong.objects.filter(group_id=groupid,username=user.username)
+            if isbelong:
+                a = []
+            else :
+                relist.append({'username':user.username})
+        ret_dict = {'code': 200, 'msg': "根据关键字查询成功", 'userlist': relist}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "查询失败"}
+        return JsonResponse(ret_dict)
+        
+def invite(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
+        groupid = request_dict.get('groupid')
+        groupname = Group.objects.filter(groupid=groupid).first().group_name
+        isbelong = Belong.objects.filter(group_id=groupid,username=username)
+        content = groupname+"团队邀请您加入，点击确认按钮加入团队，点击拒绝按钮拒绝加入"
+        if isbelong:
+            ret_dict = {'code': 401, 'msg': "该用户已经是团队成员"}
+            return JsonResponse(ret_dict)
+        else:
+            notify_object = Notify(username = username, title=groupname+"团队的邀请", notifytype=4,content=content, groupid=groupid)
+            notify_object.save()
+            ret_dict = {'code':200, 'msg': "发送通知成功"}
+            return JsonResponse(ret_dict)
+
+def receive_invitation(request): 
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
+        notify = Notify.objects.filter(username = username, notifytype__in =[4,5])
+        notifylist = []
+        if notify:
+            for item in notify:
+                notifylist.append({'MessageTitle': item.title, 'date':item.time, 'MessageContent':item.content,'notifytype':item.notifytype,'id':item.id})
+        ret_dict = {'code': 200, 'msg': "显示团队通知列表成功", 'notifydata': notifylist}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "显示团队通知列表失败"}
+        return JsonResponse(ret_dict)
+
+
+def accept(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
+        notifyid = request_dict.get('notifyid')
+        groupid = Notify.objects.filter(id=notifyid).first().groupid
+        belong = Belong(group_id=groupid,username=username)
+        belong.save()
+        notify = Notify.objects.filter(id=notifyid).first()
+        notify.notifytype=5
+        notify.save()
+        ret_dict = {'code': 200, 'msg': "接受邀请成功"}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "接受邀请失败"}
+        return JsonResponse(ret_dict)
+    
+def ignore(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        notifyid = request_dict.get('notifyid')
+        notify = Notify.objects.filter(id=notifyid).first()
+        notify.delete()
+        ret_dict = {'code': 200, 'msg': "接受邀请成功"}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "接受邀请失败"}
+        return JsonResponse(ret_dict)

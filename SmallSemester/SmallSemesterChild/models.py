@@ -70,6 +70,7 @@ class Notify(models.Model):
     notifytype = models.IntegerField()
     content = models.TextField()
     time = models.DateTimeField(auto_now = True)
+    groupid = models.IntegerField(null=True,blank=True)
 
 class Verifycode(models.Model):
     verify_id = models.IntegerField()
