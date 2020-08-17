@@ -54,6 +54,7 @@ class Browse(models.Model):
 class Belong(models.Model):
     group_id = models.IntegerField()   #foreign
     username = models.TextField()   #foreign
+    authority = models.IntegerField(default = 1)
 
 class Docbelong(models.Model):
     doc_id = models.IntegerField()      #foreign
@@ -66,7 +67,7 @@ class Favorite(models.Model):
 class Notify(models.Model):
     username = models.TextField() #foreign
     title = models.TextField(default = '通知')
-    type = models.IntegerField()
+    notifytype = models.IntegerField()
     content = models.TextField()
     time = models.DateTimeField(auto_now = True)
 

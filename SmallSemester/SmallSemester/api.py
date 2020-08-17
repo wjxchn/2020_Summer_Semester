@@ -1,6 +1,6 @@
 from django.http import JsonResponse,HttpResponse
 import json
-from SmallSemesterChild.models import Test, Plain, Test3, Group, Document, Comment, Demo, Browse, Belong, Docbelong, Favorite, Verifycode
+from SmallSemesterChild.models import Test, Plain, Test3, Group, Document, Comment, Demo, Browse, Belong, Docbelong, Favorite, Verifycode, Notify
 from SmallSemesterChild import models
 from SmallSemester import settings,token
 from django.core.mail import send_mail
@@ -759,10 +759,7 @@ def show_groupmember_list(request):
         belong_list = Belong.objects.filter(group_id = group_id)
         memberlist = []
         for belong in belong_list:
-            if belong.username == thisgroup.creater :
-                memberlist.append({'name':belong.username,'authority':'查看文件 修改文件 删除成员 增加成员','identity':'管理员',})
-            else :
-                memberlist.append({'name':belong.username,'authority':'查看文件 修改文件','identity':'成员',})
+            memberlist.append({'name':belong.username,'authority':belong.authority})
         print(memberlist)
         ret_dict = {'code': 200, 'msg': "返回成员列表成功", 'memberlist': memberlist}
         return JsonResponse(ret_dict)
@@ -894,4 +891,68 @@ def showprofilephoto(request):
         return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "显示头像图片失败"}
-        return JsonResponse(ret_dict)                    
+        return JsonResponse(ret_dict)
+
+def getsystemmessage(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
+        notify = Notify.objects.filter(username = username, notifytype = 1)
+        notifylist = []
+        if notify:
+            for item in notify:
+                notifylist.append({'MessageTitle': item.title, 'date':item.time, 'MessageContent':item.content})
+        ret_dict = {'code': 200, 'msg': "显示系统通知列表成功", 'notifydata': notifylist}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "显示系统通知列表失败"}
+        return JsonResponse(ret_dict)
+
+def getteammessage(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
+        notify = Notify.objects.filter(username = username, notifytype = 2)
+        notifylist = []
+        if notify:
+            for item in notify:
+                notifylist.append({'MessageTitle': item.title, 'date':item.time, 'MessageContent':item.content})
+        ret_dict = {'code': 200, 'msg': "显示团队通知列表成功", 'notifydata': notifylist}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "显示团队通知列表失败"}
+        return JsonResponse(ret_dict)
+
+def getdocumentmessage(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
+        notify = Notify.objects.filter(username = username, notifytype = 3)
+        notifylist = []
+        if notify:
+            for item in notify:
+                notifylist.append({'MessageTitle': item.title, 'date':item.time, 'MessageContent':item.content})
+        ret_dict = {'code': 200, 'msg': "显示文件通知列表成功", 'notifydata': notifylist}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "显示文件通知列表失败"}
+        return JsonResponse(ret_dict)
+
+def changeauthority(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
+        authority = request_dict.get('authority')
+        group_id = request_dict.get('group_id')
+        belong_obj = Belong.objects.get(username = username, group_id = group_id)
+        belong_obj.authority = authority
+        belong_obj.save()
+        ret_dict = {'code': 200, 'msg': "修改权限成功"}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "修改权限失败"}
+        return JsonResponse(ret_dict)                          

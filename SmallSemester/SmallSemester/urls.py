@@ -51,6 +51,10 @@ urlpatterns = [
     url(r'^api/addprofilephoto/$', api.addprofilephoto),
     url(r'^api/showbackgroundphoto/$', api.showbackgroundphoto),
     url(r'^api/showprofilephoto/$', api.showprofilephoto),
+    url(r'^api/getsystemmessage/$', api.getsystemmessage),
+    url(r'^api/getteammessage/$', api.getteammessage),
+    url(r'^api/getdocumentmessage/$', api.getdocumentmessage),
+    url(r'^api/changeauthority/$', api.changeauthority),
 
     url(r'^admin/', admin.site.urls),
     url(r'^', TemplateView.as_view(template_name="index.html")),
