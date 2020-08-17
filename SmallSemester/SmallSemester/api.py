@@ -567,7 +567,12 @@ def dismiss_group(request):
         group = Group.objects.filter(groupid=groupid).first()
         belonglist = Belong.objects.filter(group_id=groupid)
         docbelonglist = Docbelong.objects.filter(group_id = groupid)
+        content = group.group_name+"团队已解散，请确认"
         if username==group.creater:
+            for belong in belonglist:
+                username = belong.username
+                notify_object = Notify(username = belong.username, title="团队解散通知", notifytype=2,content=content)
+                notify_object.save()
             group.delete()
             belonglist.delete()
             docbelonglist.delete()
@@ -664,13 +669,17 @@ def delete_group_member(request):
         group = Group.objects.filter(groupid=groupid).first()
         user = Belong.objects.get(username = usernameA, group_id = groupid)
         tuser = Belong.objects.get(username = usernameB, group_id = groupid)
+        content = "您已被"+group.group_name+"团队删除，请确认"
+        notify_object = Notify(username = usernameB, title="离开团队通知", notifytype=2,content=content)
         if user.authority == 2:
             if tuser.authority < 2:
                 tuser.delete()
+                notify_object.save()
                 ret_dict = {'code': 200, 'msg': "删除团队成员成功"}
             else:
                 if usernameA == group.creater and usernameB != group.creater:
                     tuser.delete()
+                    notify_object.save()
                     ret_dict = {'code': 200, 'msg': "删除团队成员成功"}
                 else:
                     ret_dict = {'code': 402, 'msg': "无法删除团队管理员或团队创建者"}
