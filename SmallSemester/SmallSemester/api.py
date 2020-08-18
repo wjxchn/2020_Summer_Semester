@@ -792,7 +792,15 @@ def show_groupmember_list(request):
         belong_list = Belong.objects.filter(group_id = group_id)
         memberlist = []
         for belong in belong_list:
-            memberlist.append({'name':belong.username,'authority':belong.authority})
+            if belong.username == thisgroup.creater:
+                role = "团队创建者"
+            elif belong.authority == 2:
+                role = "管理员"
+            elif belong.authority == 1:
+                role = "普通成员"
+            else:
+                role = "仅查看成员"
+            memberlist.append({'name':belong.username,'authority':belong.authority,'role':role})
         print(memberlist)
         ret_dict = {'code': 200, 'msg': "返回成员列表成功", 'memberlist': memberlist}
         return JsonResponse(ret_dict)
@@ -811,7 +819,8 @@ def show_comment(request):
         commentlist = []
         if commentquery.exists():  
             for item in commentquery:
-                commentlist.append({'com_id': item.com_id, 'com_content': item.com_content, 'time': item.time, 'com_author': item.com_author, 'doc_id': item.doc_id})
+                user = models.User.objects.get(username = item.com_author)
+                commentlist.append({'com_id': item.com_id, 'com_content': item.com_content, 'time': item.time, 'com_author': item.com_author, 'doc_id': item.doc_id, 'userphotopath': user.extension.userphoto})
             ret_dict = {'code': 200, 'msg': "获取到评论内容", 'commentlist': commentlist}
             return JsonResponse(ret_dict)
         else:
@@ -1126,12 +1135,17 @@ def changegroupintro(request):
     if request.method == 'POST':
         request_data = request.body
         request_dict = json.loads(request_data.decode('utf-8'))
+        username = request_dict.get('username')
         group_id = request_dict.get('group_id')
         introduction = request_dict.get('introduction')
+        belongobj = Belong.objects.get(username = username)
         groupobj = Group.objects.get(groupid = group_id)
-        groupobj.introduction = introduction
-        groupobj.save()
-        ret_dict = {'code': 200, 'msg': "修改团队介绍成功"}
+        if belongobj.authority == 2:
+            groupobj.introduction = introduction
+            groupobj.save()
+            ret_dict = {'code': 200, 'msg': "修改团队简介成功"}
+        else:
+            ret_dict = {'code': 401, 'msg': "您的权限不足。"}
         return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "修改团队介绍失败"}
@@ -1176,4 +1190,20 @@ def unlock(request):
         return JsonResponse(ret_dict)
     else:
         ret_dict = {'code': 400, 'msg': "解锁失败"}
+        return JsonResponse(ret_dict)
+
+def show_alterhistory(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+
+        docid = request_dict.get('doc_id')
+        alterlist = Modify.objects.filter(mod_doc_id = docid)
+        alist = []
+        for item in alterlist:
+            alist.append({'altername': item.mod_user, 'altertime': item.mod_time})
+        ret_dict = {'code': 200, 'list': alist}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "查看历史修改记录失败"}
         return JsonResponse(ret_dict)            

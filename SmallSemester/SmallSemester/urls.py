@@ -66,6 +66,7 @@ urlpatterns = [
     url(r'^api/lockdoc/$', api.lock_doc),
     url(r'^api/returnlockstatus/$', api.return_lock_status),
     url(r'^api/unlock/$', api.unlock),
+    url(r'^api/showalterhistory/$', api.show_alterhistory),
     
     url(r'^admin/', admin.site.urls),
     url(r'^', TemplateView.as_view(template_name="index.html")),
