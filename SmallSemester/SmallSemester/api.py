@@ -1,6 +1,6 @@
 from django.http import JsonResponse,HttpResponse
 import json
-from SmallSemesterChild.models import Test, Plain, Test3, Group, Document, Comment, Demo, Browse, Belong, Docbelong, Favorite, Verifycode, Notify
+from SmallSemesterChild.models import Test, Plain, Test3, Group, Document, Comment, Demo, Browse, Belong, Docbelong, Favorite, Verifycode, Notify, Modify
 from SmallSemesterChild import models
 from SmallSemester import settings,token
 from django.core.mail import send_mail
@@ -260,12 +260,15 @@ def change_personal_doc(request):
         content = request_dict.get('content')
         doc_name = request_dict.get('doc_name')
         introduction = request_dict.get('introduction')
+        username = request_dict.get('username')
         doc = Document.objects.get(doc_id = docid)
         doc.doc_content = content
         doc.doc_name = doc_name
         doc.introduction = introduction
         doc.islock = False
         doc.save()
+        mod_obj = Modify(mod_user = username, mod_doc_id = docid)
+        mod_obj.save()
         ret_dict = {'code': 200, 'msg': "修改文档成功"}
         return JsonResponse(ret_dict)
     else:

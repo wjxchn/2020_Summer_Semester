@@ -81,6 +81,11 @@ class Verifycode(models.Model):
     verify_time = models.DateTimeField(default = timezone.now)
     isverify = models.BooleanField(default = False)
 
+class Modify(models.Model):
+    mod_user = models.TextField()
+    mod_doc_id = models.IntegerField()
+    mod_time = models.DateTimeField(default = timezone.now)
+
 class UserExtension(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='extension')
     name = models.TextField(default = '暂无')
