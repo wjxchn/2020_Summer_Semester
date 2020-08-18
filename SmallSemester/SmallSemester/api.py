@@ -119,6 +119,9 @@ def createuser(request):
         user.extension.backgroundphoto = "http://r.photo.store.qq.com/psc?/V52Qutst1Ze0TP0BqSlg0Ogc8N1lTYZp/45NBuzDIW489QBoVep5mcWCQKX9WHhAARbvjDHbE5p080qFMB3PE9EKYZm4ixFpGpOz2LgI6LvNURNSZH29x.*XMFGLDpA3riSY4BnJRS8k!/r"
         user.extension.userphoto = "http://r.photo.store.qq.com/psc?/V143D3j445iBwL/ubiEST8aMMlZjEEUGVmWIvQRktHhz2iAdR3J.A4nqij8aa0.iu6BoAsF9QicJOl2HSbaNWgM8nnAiFqjhgVj6jpHhRfm2MRX08O2SAq4NIQ!/r"
         user.save()
+        content = "欢迎使用福报文档，您可以使用福报文档创建属于自己的团队，以更简洁的方式互相分享文档，共同完成项目，有使用问题请移步帮助"
+        notify_object = Notify(username = username, title="尊敬的"+username+"，您已完成注册", notifytype=1,content=content)
+        notify_object.save()        
         ret_dict = {'code': 200, 'msg': "创建用户成功"}
         return JsonResponse(ret_dict)
  
@@ -261,6 +264,7 @@ def change_personal_doc(request):
         doc.doc_content = content
         doc.doc_name = doc_name
         doc.introduction = introduction
+        doc.islock = False
         doc.save()
         ret_dict = {'code': 200, 'msg': "修改文档成功"}
         return JsonResponse(ret_dict)
@@ -488,7 +492,7 @@ def show_personal_doclist(request):
         alist = []
         for doc in doclist:
             if doc.isin_recycle == False:
-                alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time,'creator':doc.doc_creater})
+                alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time,'creator':doc.doc_creater,'islock':doc.islock})
         ret_dict = {'code': 200, 'msg': "个人文档页面加载成功",'list':alist}
         return JsonResponse(ret_dict)
     else:
@@ -634,7 +638,7 @@ def show_group_doclist(request):
             doc = Document.objects.filter(doc_id = item.doc_id).first()
             if doc:
                 if doc.isin_recycle == False:
-                    alist.append({'docid': doc.doc_id, 'docname': doc.doc_name, 'creator': doc.doc_creater, 'createtime': doc.time})
+                    alist.append({'docid': doc.doc_id, 'docname': doc.doc_name, 'creator': doc.doc_creater, 'createtime': doc.time,'islock':doc.islock})
         ret_dict = {'code': 200, 'list': alist} 
         return JsonResponse(ret_dict)
     else:
@@ -1102,3 +1106,71 @@ def ignore(request):
     else:
         ret_dict = {'code': 400, 'msg': "接受邀请失败"}
         return JsonResponse(ret_dict)
+
+def showgroupintro(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        group_id = request_dict.get('group_id')
+        groupobj = Group.objects.get(groupid = group_id)
+        ret_dict = {'code': 200, 'msg': "显示团队介绍成功", 'introduction': groupobj.introduction}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "显示团队介绍失败"}
+        return JsonResponse(ret_dict)
+
+def changegroupintro(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        group_id = request_dict.get('group_id')
+        introduction = request_dict.get('introduction')
+        groupobj = Group.objects.get(groupid = group_id)
+        groupobj.introduction = introduction
+        groupobj.save()
+        ret_dict = {'code': 200, 'msg': "修改团队介绍成功"}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "修改团队介绍失败"}
+        return JsonResponse(ret_dict)
+
+def lock_doc(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        doc_id = request_dict.get('doc_id')
+        doc = Document.objects.filter(doc_id=doc_id).first()
+        doc.islock=True
+        doc.save()
+        ret_dict = {'code': 200, 'msg': "文件锁定成功"}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "文件锁定失败"}
+        return JsonResponse(ret_dict)
+
+def return_lock_status(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        doc_id = request_dict.get('doc_id')
+        doc = Document.objects.filter(doc_id=doc_id).first()
+        ret_dict = {'code': 200, 'msg': "返回锁定状态成功",'islock':doc.islock}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "返回锁定状态失败"}
+        return JsonResponse(ret_dict)
+
+def unlock(request):
+    if request.method == 'POST':
+        request_data = request.body
+        request_dict = json.loads(request_data.decode('utf-8'))
+        
+        doc_id = request_dict.get('doc_id')
+        doc = Document.objects.filter(doc_id=doc_id).first()
+        doc.islock=False
+        doc.save()
+        ret_dict = {'code': 200, 'msg': "解锁成功"}
+        return JsonResponse(ret_dict)
+    else:
+        ret_dict = {'code': 400, 'msg': "解锁失败"}
+        return JsonResponse(ret_dict)            

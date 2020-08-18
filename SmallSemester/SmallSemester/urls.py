@@ -61,6 +61,12 @@ urlpatterns = [
     url(r'^api/receiveinvitation/$', api.receive_invitation),
     url(r'^api/accept/$', api.accept),
     url(r'^api/ignore/$', api.ignore),
+    url(r'^api/showgroupintro/$', api.showgroupintro),
+    url(r'^api/changegroupintro/$', api.changegroupintro),
+    url(r'^api/lockdoc/$', api.lock_doc),
+    url(r'^api/returnlockstatus/$', api.return_lock_status),
+    url(r'^api/unlock/$', api.unlock),
+    
     url(r'^admin/', admin.site.urls),
     url(r'^', TemplateView.as_view(template_name="index.html")),
 ]

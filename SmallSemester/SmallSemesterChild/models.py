@@ -33,6 +33,7 @@ class Document(models.Model):
     doc_groupid = models.IntegerField(null=True,blank=True)   #foreign
     doc_creater = models.TextField(null=True)   #foreign
     isin_recycle = models.BooleanField()
+    islock = models.BooleanField(default=False)
 
 class Comment(models.Model):
     com_content = models.TextField()
