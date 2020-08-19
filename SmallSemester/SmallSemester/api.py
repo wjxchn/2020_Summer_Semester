@@ -265,7 +265,7 @@ def change_personal_doc(request):
         doc.doc_content = content
         doc.doc_name = doc_name
         doc.introduction = introduction
-        doc.islock = False
+        doc.islock = False 
         doc.save()
         mod_obj = Modify(mod_user = username, mod_doc_id = docid)
         mod_obj.save()
@@ -495,7 +495,7 @@ def show_personal_doclist(request):
         alist = []
         for doc in doclist:
             if doc.isin_recycle == False:
-                alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time,'creator':doc.doc_creater,'islock':doc.islock})
+                alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time.strftime("%Y-%m-%d %H:%M:%S"),'creator':doc.doc_creater,'islock':doc.islock})
         ret_dict = {'code': 200, 'msg': "个人文档页面加载成功",'list':alist}
         return JsonResponse(ret_dict)
     else:
@@ -514,7 +514,7 @@ def show_recycle_doclist(request):
         alist = []
         for doc in doclist:
             if doc.isin_recycle == True:
-                alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time, 'creator':doc.doc_creater})
+                alist.append({'docid':doc.doc_id,'docname':doc.doc_name,'createtime':doc.time.strftime("%Y-%m-%d %H:%M:%S"), 'creator':doc.doc_creater})
         ret_dict = {'code': 200, 'msg': "回收站页面加载成功", 'list': alist}
         return JsonResponse(ret_dict)
     else:
@@ -534,7 +534,7 @@ def show_favorite_doclist(request):
         for doct in doclist:
             doc = Document.objects.get(doc_id = doct.doc_id)
             if doc.isin_recycle == False:
-                alist.append({'doc_id': doc.doc_id, 'docname': doc.doc_name, 'creator':doc.doc_creater,'createtime': doc.time}) 
+                alist.append({'doc_id': doc.doc_id, 'docname': doc.doc_name, 'creator':doc.doc_creater,'createtime': doc.time.strftime("%Y-%m-%d %H:%M:%S")}) 
         ret_dict = {'code': 200, 'msg': "收藏文档页面加载成功", 'alist': alist}
         return JsonResponse(ret_dict)
     else:
@@ -641,7 +641,7 @@ def show_group_doclist(request):
             doc = Document.objects.filter(doc_id = item.doc_id).first()
             if doc:
                 if doc.isin_recycle == False:
-                    alist.append({'docid': doc.doc_id, 'docname': doc.doc_name, 'creator': doc.doc_creater, 'createtime': doc.time,'islock':doc.islock})
+                    alist.append({'docid': doc.doc_id, 'docname': doc.doc_name, 'creator': doc.doc_creater, 'createtime': doc.time.strftime("%Y-%m-%d %H:%M:%S"),'islock':doc.islock})
         ret_dict = {'code': 200, 'list': alist} 
         return JsonResponse(ret_dict)
     else:
@@ -751,9 +751,10 @@ def latest_browse(request):
             checknum = 0
             browselist = []
             for item in browse:
-                checknum = checknum+1
                 doc = Document.objects.get(doc_id=item.doc_id)
-                browselist.append({'content':doc.doc_content, 'doc_id':doc.doc_id, 'doc_time':doc.time, 'doc_name':doc.doc_name, 'doc_creater':doc.doc_creater, 'browse_time': item.browse_time})
+                if doc.isin_recycle == 0:
+                    browselist.append({'content':doc.doc_content, 'doc_id':doc.doc_id, 'doc_time':doc.time, 'doc_name':doc.doc_name, 'doc_creater':doc.doc_creater, 'browse_time': item.browse_time})
+                    checknum = checknum+1
                 if checknum == 8:
                     break
             ret_dict = {'code': 200, 'msg': "返回最后浏览成功", 'browselistdata': browselist}
@@ -820,7 +821,7 @@ def show_comment(request):
         if commentquery.exists():  
             for item in commentquery:
                 user = models.User.objects.get(username = item.com_author)
-                commentlist.append({'com_id': item.com_id, 'com_content': item.com_content, 'time': item.time, 'com_author': item.com_author, 'doc_id': item.doc_id, 'userphotopath': user.extension.userphoto})
+                commentlist.append({'com_id': item.com_id, 'com_content': item.com_content, 'time': item.time.strftime("%Y-%m-%d %H:%M:%S"), 'com_author': item.com_author, 'doc_id': item.doc_id, 'userphotopath': user.extension.userphoto})
             ret_dict = {'code': 200, 'msg': "获取到评论内容", 'commentlist': commentlist}
             return JsonResponse(ret_dict)
         else:
@@ -944,7 +945,7 @@ def getsystemmessage(request):
         notifylist = []
         if notify:
             for item in notify:
-                notifylist.append({'MessageTitle': item.title, 'date':item.time, 'MessageContent':item.content})
+                notifylist.append({'MessageTitle': item.title, 'date':item.time.strftime("%Y-%m-%d %H:%M:%S"), 'MessageContent':item.content})
         ret_dict = {'code': 200, 'msg': "显示系统通知列表成功", 'notifydata': notifylist}
         return JsonResponse(ret_dict)
     else:
@@ -960,7 +961,7 @@ def getteammessage(request):
         notifylist = []
         if notify:
             for item in notify:
-                notifylist.append({'MessageTitle': item.title, 'date':item.time, 'MessageContent':item.content})
+                notifylist.append({'MessageTitle': item.title, 'date':item.time.strftime("%Y-%m-%d %H:%M:%S"), 'MessageContent':item.content})
         ret_dict = {'code': 200, 'msg': "显示团队通知列表成功", 'notifydata': notifylist}
         return JsonResponse(ret_dict)
     else:
@@ -976,7 +977,7 @@ def getdocumentmessage(request):
         notifylist = []
         if notify:
             for item in notify:
-                notifylist.append({'MessageTitle': item.title, 'date':item.time, 'MessageContent':item.content})
+                notifylist.append({'MessageTitle': item.title, 'date':item.time.strftime("%Y-%m-%d %H:%M:%S"), 'MessageContent':item.content})
         ret_dict = {'code': 200, 'msg': "显示文件通知列表成功", 'notifydata': notifylist}
         return JsonResponse(ret_dict)
     else:
@@ -1080,7 +1081,7 @@ def receive_invitation(request):
         notifylist = []
         if notify:
             for item in notify:
-                notifylist.append({'MessageTitle': item.title, 'date':item.time, 'MessageContent':item.content,'notifytype':item.notifytype,'id':item.id})
+                notifylist.append({'MessageTitle': item.title, 'date':item.time.strftime("%Y-%m-%d %H:%M:%S"), 'MessageContent':item.content,'notifytype':item.notifytype,'id':item.id})
         ret_dict = {'code': 200, 'msg': "显示团队通知列表成功", 'notifydata': notifylist}
         return JsonResponse(ret_dict)
     else:
@@ -1201,7 +1202,7 @@ def show_alterhistory(request):
         alterlist = Modify.objects.filter(mod_doc_id = docid)
         alist = []
         for item in alterlist:
-            alist.append({'altername': item.mod_user, 'altertime': item.mod_time})
+            alist.append({'altername': item.mod_user, 'altertime': item.mod_time.strftime("%Y-%m-%d %H:%M:%S")})
         ret_dict = {'code': 200, 'list': alist}
         return JsonResponse(ret_dict)
     else:
